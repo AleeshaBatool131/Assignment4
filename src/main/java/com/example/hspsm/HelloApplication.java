@@ -4,15 +4,16 @@ import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -36,79 +37,106 @@ public class HelloApplication extends Application{
         stage.show();
     }
 
-    public void welcomeScreen(Stage stage) {
+    public  void welcomeScreen(Stage stage) {
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(30);
         vBox.setPadding(new Insets(20));
-        vBox.setStyle("-fx-background-color: linear-gradient(to bottom, #34495e, #2c3e50);");
+        vBox.setBackground(background());
 
         Text welcome = new Text("Welcome to Housing Society Plot Management System");
         welcome.setTextAlignment(TextAlignment.CENTER);
-        welcome.setFill(Color.WHITE);
-        welcome.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: Arial;");
+        welcome.setFill(Color.BLACK);
+        welcome.setStyle("-fx-font-size: 36px; -fx-font-weight: bold; -fx-font-family: Times New Roman;");
 
+        Label loadingLabel = new Label("Loading....");
+        loadingLabel.setTextFill(Color.BLACK);
+        loadingLabel.setFont(new Font("Times New Roman", 36));
 
-        Button nextButton = new Button("Next");
-        nextButton.setStyle("-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14px; -fx-font-family: Arial;");
-        nextButton.setOnAction(e -> loginScreen(stage));
+        ProgressBar progressBar = new ProgressBar(0);
+        progressBar.setPrefWidth(800);
+        progressBar.setStyle("-fx-background-color: transparent; -fx-accent: blue;");
 
+        vBox.getChildren().addAll(welcome, loadingLabel, progressBar);
 
-        vBox.getChildren().addAll(welcome, nextButton);
+        Task<Void> loadingTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                for(int i=0;i<=100;i++){
+                    Thread.sleep(10);
+                    updateProgress(i, 100);
+                }
+                return null;
+            }
+        };
+
+        progressBar.progressProperty().bind(loadingTask.progressProperty());
+        loadingTask.setOnSucceeded(e-> loginScreen(stage));
 
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Welcome Screen");
+
+        new Thread(loadingTask).start();
     }
-    public static void loginScreen(Stage stage) {
+    public void loginScreen(Stage stage) {
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(20);
         vBox.setPadding(new Insets(20));
-        vBox.setStyle("-fx-background-color: #ecf0f1;");
+        vBox.setBackground(background());
+        Label loginLabel = new Label ("Login");
+        loginLabel.setFont(new Font("Times New Roman", 60));
+        loginLabel.setTextFill(Color.BLACK);
+        loginLabel.setStyle("-fx-font-weight: bold;");
+        loginLabel.setAlignment(Pos.CENTER);
+        loginLabel.setPadding(new Insets(10, 20, 50, 150));
 
+        Label signupLabel = new Label("New Buyer? Register Here");
+        signupLabel.setStyle("-fx-text-fill: black; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;");
+        signupLabel.setOnMouseClicked(e->registerUser(stage));
         Label usernameLabel = new Label("Username:");
         Label passwordLabel = new Label("Password:");
-        usernameLabel.setStyle("-fx-text-fill: #34495e; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;");
-        passwordLabel.setStyle("-fx-text-fill: #34495e; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;");
+        usernameLabel.setStyle("-fx-text-fill: black; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;");
+        passwordLabel.setStyle("-fx-text-fill: black; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;");
 
 
         TextField usernameField = new TextField();
         usernameField.setPromptText("Enter your username");
-        usernameField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: #ccc; -fx-border-radius: 5px;");
+        usernameField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+        usernameField.setPrefWidth(500);
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter your password");
-        passwordField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: #ccc; -fx-border-radius: 5px;");
+        passwordField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+        passwordField.setPrefWidth(500);
 
+        usernameField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                passwordField.requestFocus();
+        });
 
         Button login = new Button("Login");
         Button admin = new Button("Login as Admin");
-        Button register = new Button("Sign Up");
-
 
         String buttonStyle = "-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 12px 30px; -fx-font-size: 16px; -fx-font-family: Arial; -fx-border-radius: 5px;";
 
         login.setStyle(buttonStyle);
         admin.setStyle(buttonStyle);
-        register.setStyle(buttonStyle);
-
-
+        signupLabel.setOnMouseEntered(e->{
+            signupLabel.setStyle("-fx-text-fill: blue; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;");
+        });
+        signupLabel.setOnMouseExited(e->signupLabel.setStyle("-fx-text-fill: black; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;"));
         login.setOnMouseEntered(e -> login.setStyle("-fx-background-color: #2980b9; -fx-text-fill: white; -fx-padding: 12px 30px; -fx-font-size: 16px; -fx-font-family: Arial; -fx-border-radius: 5px;"));
         login.setOnMouseExited(e -> login.setStyle(buttonStyle));
 
         admin.setOnMouseEntered(e -> admin.setStyle("-fx-background-color: #2980b9; -fx-text-fill: white; -fx-padding: 12px 30px; -fx-font-size: 16px; -fx-font-family: Arial; -fx-border-radius: 5px;"));
         admin.setOnMouseExited(e -> admin.setStyle(buttonStyle));
 
-        register.setOnMouseEntered(e -> register.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-padding: 12px 30px; -fx-font-size: 16px; -fx-font-family: Arial; -fx-border-radius: 5px;"));
-        register.setOnMouseExited(e -> register.setStyle(buttonStyle));
-
-
         Text invalidMessage = new Text();
         invalidMessage.setTextAlignment(TextAlignment.CENTER);
         invalidMessage.setFill(Color.RED);
         invalidMessage.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-
 
         List<User> users = loadUsers();
         login.setOnAction(e -> {
@@ -123,52 +151,110 @@ public class HelloApplication extends Application{
             }
         });
 
-        register.setOnAction(e -> registerUser(stage));
         admin.setOnAction(e -> adminLoginScreen(stage));
-
 
         GridPane inputGrid = new GridPane();
         inputGrid.setAlignment(Pos.CENTER);
         inputGrid.setHgap(10);
-        inputGrid.setVgap(10);
-        inputGrid.add(usernameLabel, 0, 0);
-        inputGrid.add(usernameField, 1, 0);
-        inputGrid.add(passwordLabel, 0, 1);
-        inputGrid.add(passwordField, 1, 1);
+        inputGrid.setVgap(30);
+        inputGrid.add(loginLabel, 0, 0);
+        inputGrid.add(usernameLabel, 0, 1);
+        inputGrid.add(usernameField, 0, 2);
+        inputGrid.add(passwordLabel, 0, 3);
+        inputGrid.add(passwordField, 0, 4);
 
 
-        vBox.getChildren().addAll(inputGrid, invalidMessage, login, admin, register);
+        vBox.getChildren().addAll(inputGrid, invalidMessage, login, admin, signupLabel);
 
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Login Screen");
     }
-    public static void adminDashboardScene(Stage stage) {
+    public  void adminDashboardScene(Stage stage) {
 
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(15);
         vBox.setPadding(new Insets(20));
-
+        vBox.setBackground(background());
 
         Label titleLabel = new Label("Admin Dashboard");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+        titleLabel.setFont(new Font("Times New Roman", 60));
+        titleLabel.setPadding(new Insets(20, 30,30, 30));
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
 
+        GridPane functionsGridPane = new GridPane();
 
-        Button manageUsersButton = createStyledButton("Manage Users", "#4CAF50");
-        Button managePlotsButton = createStyledButton("Manage Plots", "#4CAF50");
-        Button managePaymentsButton = createStyledButton("Manage Payments", "#4CAF50");
-        Button generateReportsButton = createStyledButton("Generate Reports", "#4CAF50");
+        Button manageUsersButton = new Button();
+        Button managePlotsButton = new Button();
+        Button managePaymentsButton = new Button();
+        Button generateReportsButton = new Button();
 
-        Button logoutButton = createStyledButton("Logout", "#F44336");
+        VBox userBox = new VBox();
+        VBox plotsBox = new VBox();
+        VBox reportBox = new VBox();
+        VBox paymentBox = new VBox();
 
+        userBox.setSpacing(10);
+        userBox.setAlignment(Pos.CENTER);
+        Image userLogo = new Image(this.getClass().getResource("/usersLogo.png").toExternalForm());
+        ImageView userImage = new ImageView(userLogo);
+        Label userText = new Label("Manage Users");
+        userText.setFont(new Font("Times New Roman", 18));
+        userBox.getChildren().addAll(userImage, userText);
+        manageUsersButton.setPrefSize(500, 300);
+        manageUsersButton.setStyle("-fx-background-color: lightblue; -fx-border-color: black; -fx-border-width: 2;");
+        manageUsersButton.setGraphic(userBox);
+
+        plotsBox.setSpacing(10);
+        plotsBox.setAlignment(Pos.CENTER);
+        Image plotLogo = new Image(this.getClass().getResource("/plotsLogo.png").toExternalForm());
+        ImageView plotImage = new ImageView(plotLogo);
+        Label plotText = new Label("Manage Plots");
+        plotText.setFont(new Font("Times New Roman", 18));
+        plotsBox.getChildren().addAll(plotImage, plotText);
+        managePlotsButton.setPrefSize(500, 300);
+        managePlotsButton.setStyle("-fx-background-color: lightblue; -fx-border-color: black; -fx-border-width: 2;");
+        managePlotsButton.setGraphic(plotsBox);
+
+        paymentBox.setSpacing(10);
+        paymentBox.setAlignment(Pos.CENTER);
+        Image paymentLogo = new Image(this.getClass().getResource("/paymentsLogo.png").toExternalForm());
+        ImageView paymentImage = new ImageView(paymentLogo);
+        Label paymentText = new Label("Manage Payments");
+        paymentText.setFont(new Font("Times New Roman", 18));
+        paymentBox.getChildren().addAll(paymentImage, paymentText);
+        managePaymentsButton.setPrefSize(500, 300);
+        managePaymentsButton.setStyle("-fx-background-color: lightblue; -fx-border-color: black; -fx-border-width: 2;");
+        managePaymentsButton.setGraphic(paymentBox);
+
+        reportBox.setSpacing(10);
+        reportBox.setAlignment(Pos.CENTER);
+        Image reportLogo = new Image(this.getClass().getResource("/reportLogo.png").toExternalForm());
+        ImageView reportImage = new ImageView(reportLogo);
+        Label reportText = new Label("Generate Reports");
+        reportText.setFont(new Font("Times New Roman", 18));
+        reportBox.getChildren().addAll(reportImage, reportText);
+        generateReportsButton.setPrefSize(500, 300);
+        generateReportsButton.setStyle("-fx-background-color: lightblue; -fx-border-color: black; -fx-border-width: 2;");
+        generateReportsButton.setGraphic(reportBox);
+
+        functionsGridPane.setHgap(20);
+        functionsGridPane.setVgap(20);
+        functionsGridPane.setAlignment(Pos.CENTER);
+
+        functionsGridPane.add(manageUsersButton, 0,0);
+        functionsGridPane.add(managePlotsButton,1,0);
+        functionsGridPane.add(managePaymentsButton, 0, 1);
+        functionsGridPane.add(generateReportsButton,1, 1);
+
+        Button logoutButton = new Button("Logout");
+        logoutButton.setStyle( "-fx-background-color: red ;-fx-text-fill: white;-fx-font-size: 14; -fx-padding: 10 20; -fx-background-radius: 5;");
+        logoutButton.setPrefWidth(300);
 
         vBox.getChildren().addAll(
                 titleLabel,
-                manageUsersButton,
-                managePlotsButton,
-                managePaymentsButton,
-                generateReportsButton,
+                functionsGridPane,
                 logoutButton
         );
 
@@ -187,20 +273,7 @@ public class HelloApplication extends Application{
     }
 
 
-    private static Button createStyledButton(String text, String color) {
-        Button button = new Button(text);
-        button.setStyle(
-                "-fx-background-color: " + color + "; " +
-                        "-fx-text-fill: white; " +
-                        "-fx-font-size: 14; " +
-                        "-fx-padding: 10 20; " +
-                        "-fx-background-radius: 5;"
-        );
-        return button;
-    }
-
-
-    public static void UserManagementScene(Stage stage) {
+    public void UserManagementScene(Stage stage) {
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(10);
@@ -328,7 +401,7 @@ public class HelloApplication extends Application{
         stage.setTitle("User Management");
     }
 
-    public static void managePlotsScene(Stage stage) {
+    public void managePlotsScene(Stage stage) {
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(10);
@@ -520,7 +593,7 @@ public class HelloApplication extends Application{
         stage.setTitle("Plot Management");
     }
 
-    public static void managePaymentsScene(Stage stage){
+    public void managePaymentsScene(Stage stage){
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
 
@@ -653,35 +726,108 @@ public class HelloApplication extends Application{
             alert.show();
         }
     }
-    public static void buyerDashboard(Stage stage) {
-        // Main VBox layout
+    public void buyerDashboard(Stage stage) {
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(15);
         vBox.setPadding(new Insets(20));
+        vBox.setBackground(background());
+
+        Label titleLabel = new Label("Buyer Dashboard");
+        titleLabel.setFont(new Font("Times New Roman", 55));
+        titleLabel.setPadding(new Insets(20, 30,30, 30));
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+
+        GridPane functionsGridPane = new GridPane();
+        functionsGridPane.setVgap(15);
+        functionsGridPane.setHgap(15);
+        functionsGridPane.setAlignment(Pos.CENTER);
+
+        VBox viewPlotsBox = new VBox();
+        VBox requestPlotBox = new VBox();
+        VBox ownershipDetailsBox = new VBox();
+        VBox paymentBox = new VBox();
+        VBox updateBox = new VBox();
+        VBox mapBox = new VBox();
 
         // Create buttons
-        Button viewPlots = new Button("View Available Plots");
-        Button requestPlot = new Button("Request Plot");
-        Button ownershipDetails = new Button("Ownership Details");
-        Button trackPaymentStatus = new Button("Track Payment Status");
-        Button updatePreference = new Button("Update Preference");
-        Button viewMap = new Button("View Map"); // New Map button
-        Button exit = new Button("Exit");
+        Button viewPlots = new Button();
+        Button requestPlot = new Button();
+        Button ownershipDetails = new Button();
+        Button trackPaymentStatus = new Button();
+        Button updatePreference = new Button();
+        Button viewMap = new Button(); // New Map button
+
+        viewPlotsBox.setSpacing(10);
+        viewPlotsBox.setAlignment(Pos.CENTER);
+        Image viewPlotsLogo = new Image(this.getClass().getResource("/plotsLogo.png").toExternalForm());
+        ImageView viewPlotsImage = new ImageView(viewPlotsLogo);
+        Label userText = new Label("View Available Plots");
+        userText.setFont(new Font("Times New Roman", 18));
+        viewPlotsBox.getChildren().addAll(viewPlotsImage, userText);
+        viewPlots.setPrefSize(500, 300);
+        viewPlots.setStyle("-fx-background-color: lightblue; -fx-border-color: black; -fx-border-width: 2;");
+        viewPlots.setGraphic(viewPlotsBox);
+
+        requestPlotBox.setSpacing(10);
+        requestPlotBox.setAlignment(Pos.CENTER);
+        Image requestPlotLogo = new Image(this.getClass().getResource("/requestplotLogo.png").toExternalForm());
+        ImageView requestPlotImage = new ImageView(requestPlotLogo);
+        Label requestPlotText = new Label("Request Plot");
+        requestPlotText.setFont(new Font("Times New Roman", 18));
+        requestPlotBox.getChildren().addAll(requestPlotImage, requestPlotText);
+        requestPlot.setPrefSize(500, 300);
+        requestPlot.setStyle("-fx-background-color: lightblue; -fx-border-color: black; -fx-border-width: 2;");
+        requestPlot.setGraphic(requestPlotBox);
+
+        ownershipDetailsBox.setSpacing(10);
+        ownershipDetailsBox.setAlignment(Pos.CENTER);
+        Image ownershipDetailsLogo = new Image(this.getClass().getResource("/ownershipDetailLogo.png").toExternalForm());
+        ImageView ownershipDetailsImage = new ImageView(ownershipDetailsLogo);
+        Label ownershipDetailsText = new Label("Ownership Details");
+        ownershipDetailsText.setFont(new Font("Times New Roman", 18));
+        ownershipDetailsBox.getChildren().addAll(ownershipDetailsImage, ownershipDetailsText);
+        ownershipDetails.setPrefSize(500, 300);
+        ownershipDetails.setStyle("-fx-background-color: lightblue; -fx-border-color: black; -fx-border-width: 2;");
+        ownershipDetails.setGraphic(ownershipDetailsBox);
+
+        paymentBox.setSpacing(10);
+        paymentBox.setAlignment(Pos.CENTER);
+        Image paymentLogo = new Image(this.getClass().getResource("/paymentsLogo.png").toExternalForm());
+        ImageView paymentImage = new ImageView(paymentLogo);
+        Label paymentText = new Label("Track Payment Status");
+        paymentText.setFont(new Font("Times New Roman", 18));
+        paymentBox.getChildren().addAll(paymentImage, paymentText);
+        trackPaymentStatus.setPrefSize(500, 300);
+        trackPaymentStatus.setStyle("-fx-background-color: lightblue; -fx-border-color: black; -fx-border-width: 2;");
+        trackPaymentStatus.setGraphic(paymentBox);
+
+        updateBox.setSpacing(10);
+        updateBox.setAlignment(Pos.CENTER);
+        Image updateLogo = new Image(this.getClass().getResource("/updateLogo.png").toExternalForm());
+        ImageView updateImage = new ImageView(updateLogo);
+        Label updateText = new Label("Update Preferences");
+        updateText.setFont(new Font("Times New Roman", 18));
+        updateBox.getChildren().addAll(updateImage, updateText);
+        updatePreference.setPrefSize(500, 300);
+        updatePreference.setStyle("-fx-background-color: lightblue; -fx-border-color: black; -fx-border-width: 2;");
+        updatePreference.setGraphic(updateBox);
+
+        mapBox.setSpacing(10);
+        mapBox.setAlignment(Pos.CENTER);
+        Image mapLogo = new Image(this.getClass().getResource("/viewMapLogo.png").toExternalForm());
+        ImageView mapImage = new ImageView(mapLogo);
+        Label mapText = new Label("View Map");
+        mapText.setFont(new Font("Times New Roman", 18));
+        mapBox.getChildren().addAll(mapImage, mapText);
+        viewMap.setPrefSize(500, 300);
+        viewMap.setStyle("-fx-background-color: lightblue; -fx-border-color: black; -fx-border-width: 2;");
+        viewMap.setGraphic(mapBox);
+
         Button logout = new Button("Logout");
-
-        // Set button styles
-        String buttonStyle = "-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14;";
-        viewPlots.setStyle(buttonStyle);
-        requestPlot.setStyle(buttonStyle);
-        ownershipDetails.setStyle(buttonStyle);
-        trackPaymentStatus.setStyle(buttonStyle);
-        updatePreference.setStyle(buttonStyle);
-        viewMap.setStyle(buttonStyle); // Style for the new button
-        logout.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14;");
-        exit.setStyle("-fx-background-color: #F44336; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14;");
-
-        // Set button actions
+        logout.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14;");
+        logout.setPrefSize(150, 80);
+//         Set button actions
         viewPlots.setOnAction(e -> viewPlots(stage));
         requestPlot.setOnAction(e -> requestPlot(stage));
         ownershipDetails.setOnAction(e -> ownershipDetails(stage));
@@ -695,18 +841,17 @@ public class HelloApplication extends Application{
         logout.setOnAction(e -> {
             loginScreen(stage);
         });
-        exit.setOnAction(e -> stage.close());
 
+        functionsGridPane.add(viewPlots, 0,0);
+        functionsGridPane.add(requestPlot,0,1);
+        functionsGridPane.add(ownershipDetails,0,2);
+        functionsGridPane.add(trackPaymentStatus,1,0);
+        functionsGridPane.add(updatePreference,1,1);
+        functionsGridPane.add(viewMap, 1, 2);
         // Add buttons to VBox
-        vBox.getChildren().addAll(
-                viewPlots,
-                requestPlot,
-                ownershipDetails,
-                trackPaymentStatus,
-                updatePreference,
-                viewMap, // Added the view map button
-                logout,
-                exit
+        vBox.getChildren().addAll(titleLabel,
+                functionsGridPane,
+                logout
         );
 
         // Create scene and set on stage
@@ -715,34 +860,52 @@ public class HelloApplication extends Application{
         stage.setTitle("Buyer Dashboard");
     }
 
-    public static void adminLoginScreen(Stage stage) {
-        // VBox for main layout
+    public void adminLoginScreen(Stage stage) {
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(20);
         vBox.setPadding(new Insets(20));
+        vBox.setBackground(background());
+        Label loginLabel = new Label ("Login");
+        loginLabel.setFont(new Font("Times New Roman", 60));
+        loginLabel.setTextFill(Color.BLACK);
+        loginLabel.setStyle("-fx-font-weight: bold;");
+        loginLabel.setAlignment(Pos.CENTER);
+        loginLabel.setPadding(new Insets(10, 20, 50, 150));
 
-        // Labels and fields
-        Label usernameLabel = new Label("Username: ");
-        Label passwordLabel = new Label("Password: ");
+        Label usernameLabel = new Label("Username:");
+        Label passwordLabel = new Label("Password:");
+        usernameLabel.setStyle("-fx-text-fill: black; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;");
+        passwordLabel.setStyle("-fx-text-fill: black; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;");
+
         TextField usernameField = new TextField();
         usernameField.setPromptText("Enter admin username");
+        usernameField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+        usernameField.setPrefWidth(500);
+
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter admin password");
+        passwordField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+        passwordField.setPrefWidth(500);
 
-        // Login button
+        usernameField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                passwordField.requestFocus();
+        });
+
         Button login = new Button("Login");
-        login.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10 20;");
 
-        // Error message text
+        String buttonStyle = "-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 12px 30px; -fx-font-size: 16px; -fx-font-family: Arial; -fx-border-radius: 5px;";
+
+        login.setStyle(buttonStyle);
+        login.setOnMouseEntered(e -> login.setStyle("-fx-background-color: #2980b9; -fx-text-fill: white; -fx-padding: 12px 30px; -fx-font-size: 16px; -fx-font-family: Arial; -fx-border-radius: 5px;"));
+        login.setOnMouseExited(e -> login.setStyle(buttonStyle));
+
         Text invalidMessage = new Text();
         invalidMessage.setTextAlignment(TextAlignment.CENTER);
         invalidMessage.setFill(Color.RED);
-        invalidMessage.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        invalidMessage.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 
-        // Load users and handle admin login
-        User userObj = new User();
-        List<User> users = userObj.loadUsers();
         login.setOnAction(e -> {
             boolean isAdmin = "Admin".equals(usernameField.getText()) && "admin".equals(passwordField.getText());
             if (isAdmin) {
@@ -752,31 +915,41 @@ public class HelloApplication extends Application{
             }
         });
 
-        // Layout for username and password inputs
         GridPane inputGrid = new GridPane();
         inputGrid.setAlignment(Pos.CENTER);
         inputGrid.setHgap(10);
-        inputGrid.setVgap(10);
-        inputGrid.add(usernameLabel, 0, 0);
-        inputGrid.add(usernameField, 1, 0);
-        inputGrid.add(passwordLabel, 0, 1);
-        inputGrid.add(passwordField, 1, 1);
+        inputGrid.setVgap(30);
+        inputGrid.add(loginLabel, 0, 0);
+        inputGrid.add(usernameLabel, 0, 1);
+        inputGrid.add(usernameField, 0, 2);
+        inputGrid.add(passwordLabel, 0, 3);
+        inputGrid.add(passwordField, 0, 4);
 
-        // Add components to the VBox
+
         vBox.getChildren().addAll(inputGrid, invalidMessage, login);
 
-        // Scene and stage setup
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Admin Login");
     }
-    public static void registerUser(Stage stage) {
+    public void registerUser(Stage stage) {
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(15);
         vBox.setPadding(new Insets(10));
-        vBox.setStyle("-fx-background-color: linear-gradient(to bottom, #8e44ad, #3498db);");
+        vBox.setBackground(background());
 
+        Label signupLabel = new Label("Sign Up");
+        signupLabel.setFont(Font.font("Times New Roman", FontWeight.BOLD, 60));
+        signupLabel.setTextFill(Color.BLACK);
+        signupLabel.setAlignment(Pos.CENTER);
+        signupLabel.setPadding(new Insets(10, 20, 50, 30));
+
+        GridPane inputGrid = new GridPane();
+        inputGrid.setAlignment(Pos.CENTER);
+        inputGrid.setHgap(10);
+        inputGrid.setVgap(15);
+        inputGrid.setPadding(new Insets(20, 30, 20, 20));
         Label username = new Label("Username:");
         Label password = new Label("Password:");
         Label email = new Label("Email:");
@@ -785,25 +958,97 @@ public class HelloApplication extends Application{
         Label preferredSize = new Label("Preferred Size:");
         Label budget = new Label("Budget:");
 
-        username.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-family: Arial;");
-        password.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-family: Arial;");
-        email.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-family: Arial;");
-        phoneNumber.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-family: Arial;");
-        preferredLocation.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-family: Arial;");
-        preferredSize.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-family: Arial;");
-        budget.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-family: Arial;");
+        username.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+        password.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+        email.setStyle("-fx-text-fill:black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+        phoneNumber.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+        preferredLocation.setStyle("-fx-text-fill:black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+        preferredSize.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+        budget.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
 
         TextField usernameField = new TextField();
+        usernameField.setPromptText("Enter your username");
+        usernameField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+        usernameField.setPrefWidth(800);
         PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Enter password");
+        passwordField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+        passwordField.setPrefWidth(800);
         TextField emailField = new TextField();
+        emailField.setPromptText("Enter your email");
+        emailField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+        emailField.setPrefWidth(800);
         TextField phoneNumberField = new TextField();
+        phoneNumberField.setPromptText("Enter your phone number");
+        phoneNumberField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+        phoneNumberField.setPrefWidth(800);
         TextField preferredLocationField = new TextField();
+        preferredLocationField.setPromptText("Enter your Preferred Plot Location");
+        preferredLocationField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+        preferredLocationField.setPrefWidth(800);
         TextField preferredSizeField = new TextField();
+        preferredSizeField.setPromptText("Enter your Preferred Plot Size");
+        preferredSizeField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+        preferredSizeField.setPrefWidth(800);
         TextField budgetField = new TextField();
+        budgetField.setPromptText("Enter your Budget");
+        budgetField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+        budgetField.setPrefWidth(800);
 
         Button register = new Button("Register");
-        register.setStyle("-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14px; -fx-font-family: Arial;");
+        register.setStyle("-fx-background-color: #1abc9c; -fx-text-fill: black; -fx-padding: 10 20; -fx-font-size: 16px; -fx-font-family: Arial;");
 
+        Button cancel = new Button("Cancel");
+        cancel.setStyle("-fx-background-color: #1abc9c; -fx-text-fill: black; -fx-padding: 10 20; -fx-font-size: 16px; -fx-font-family: Arial;");
+
+        HBox buttonBox = new HBox(cancel, register);
+
+        inputGrid.add(username, 0, 0);
+        inputGrid.add(usernameField, 1,0);
+        inputGrid.add(password, 0, 1);
+        inputGrid.add(passwordField,1,1);
+        inputGrid.add(email,0, 2);
+        inputGrid.add(emailField, 1, 2);
+        inputGrid.add(phoneNumber,0,3);
+        inputGrid.add(phoneNumberField,1,3);
+        inputGrid.add(preferredLocation,0, 4);
+        inputGrid.add(preferredLocationField,1, 4);
+        inputGrid.add(preferredSize,0,5);
+        inputGrid.add(preferredSizeField,1,5);
+        inputGrid.add(budget,0,6);
+        inputGrid.add(budgetField,1,6);
+
+        usernameField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                passwordField.requestFocus();
+        });
+        passwordField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                emailField.requestFocus();
+        });
+        emailField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                phoneNumberField.requestFocus();
+        });
+        phoneNumberField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                preferredLocationField.requestFocus();
+        });
+        usernameField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                passwordField.requestFocus();
+        });
+        preferredLocationField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                preferredSizeField.requestFocus();
+        });
+        preferredSizeField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                budgetField.requestFocus();
+        });
+
+        buttonBox.setSpacing(15);
+        buttonBox.setAlignment(Pos.CENTER);
         register.setOnAction(e -> {
             List<User> users = loadUsers();
             List<Buyer> buyers = loadBuyers();
@@ -815,14 +1060,18 @@ public class HelloApplication extends Application{
             buyerDashboard(stage);
         });
 
-        vBox.getChildren().addAll(username, usernameField, password, passwordField, email, emailField, phoneNumber, phoneNumberField, preferredLocation, preferredLocationField, preferredSize, preferredSizeField, budget, budgetField, register);
+        cancel.setOnAction(e->{
+            loginScreen(stage);
+        });
+
+        vBox.getChildren().addAll(signupLabel,inputGrid, buttonBox);
 
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Register User");
     }
 
-    private static void viewPlots(Stage stage){
+    private void viewPlots(Stage stage){
         VBox vBox = new VBox();
         Button exit = new Button("Exit");
         TableView plotTable = new TableView<>();
@@ -887,7 +1136,7 @@ public class HelloApplication extends Application{
         stage.setScene(scene);
         stage.setTitle("Login Screen");
     }
-    public static void requestPlot(Stage stage) {
+    public void requestPlot(Stage stage) {
         VBox vBox = new VBox();
         Label label = new Label("Request a Plot");
         TextField plotIdField = new TextField();
@@ -919,7 +1168,7 @@ public class HelloApplication extends Application{
         stage.setTitle("Request Plot");
     }
 
-    public static void ownershipDetails(Stage stage) {
+    public void ownershipDetails(Stage stage) {
         VBox vBox = new VBox();
         Label label = new Label("Ownership Details");
         TableView<Document> tableView = new TableView<>();
@@ -965,7 +1214,7 @@ public class HelloApplication extends Application{
         stage.setTitle("Ownership Details");
     }
 
-    public static void trackPaymentStatus(Stage stage) {
+    public void trackPaymentStatus(Stage stage) {
         VBox vBox = new VBox();
         Label label = new Label("Track Payment Status");
 
@@ -1052,7 +1301,7 @@ public class HelloApplication extends Application{
         alert.showAndWait();
     }
 
-    public static void updatePreference(Stage stage) {
+    public void updatePreference(Stage stage) {
         VBox vBox = new VBox();
         Label label = new Label("Update Preferences");
 
@@ -1226,6 +1475,10 @@ public class HelloApplication extends Application{
         }
     }
 
-
+    private Background background(){
+        Image image = new Image(this.getClass().getResource("/LandscapeBackground.jpg").toExternalForm());
+        BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,BackgroundPosition.CENTER,new BackgroundSize(100, 100, true, true, true, false));
+        return new Background(backgroundImage);
+    }
 
 }

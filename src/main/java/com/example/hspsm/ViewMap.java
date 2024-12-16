@@ -60,7 +60,7 @@ class MainScene {
             blockPane.add(block, (i - 1) % 3, (i - 1) / 3);
         }
 
-        this.scene = new Scene(blockPane, 600, 500);
+        this.scene = new Scene(blockPane, 1300, 800);
     }
 
     public Scene getScene() {
@@ -110,7 +110,7 @@ class PlotScene {
             }
         }
 
-        this.scene = new Scene(plotPane, cols * plotSize, rows * (plotSize + roadWidth));
+        this.scene = new Scene(plotPane, 1300, 800);
     }
 
     public Scene getScene() {
