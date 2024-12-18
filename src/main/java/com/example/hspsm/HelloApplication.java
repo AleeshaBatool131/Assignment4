@@ -1,14 +1,15 @@
 package com.example.hspsm;
 
-import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
 import javafx.scene.Scene;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -25,9 +26,8 @@ import java.time.LocalDate;
 import java.util.*;
 
 import java.io.*;
+import java.util.stream.Collectors;
 
-import static com.example.hspsm.Admin.analyzePlotStatistics;
-import static com.example.hspsm.Admin.generateReports;
 
 public class HelloApplication extends Application{
     public static int userCount = 1;
@@ -59,7 +59,7 @@ public class HelloApplication extends Application{
 
         vBox.getChildren().addAll(welcome, loadingLabel, progressBar);
 
-        Task<Void> loadingTask = new Task<Void>() {
+        Task<Void> loadingTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 for(int i=0;i<=100;i++){
@@ -111,21 +111,22 @@ public class HelloApplication extends Application{
         passwordField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
         passwordField.setPrefWidth(500);
 
+        Button login = new Button("Login");
+        Button admin = new Button("Login as Admin");
+
+        String buttonStyle = "-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 12px 30px; -fx-font-size: 16px; -fx-font-family: Arial; -fx-border-radius: 5px;";
         usernameField.setOnKeyPressed(e->{
             if(e.getCode().toString().equals("ENTER"))
                 passwordField.requestFocus();
         });
 
-        Button login = new Button("Login");
-        Button admin = new Button("Login as Admin");
-
-        String buttonStyle = "-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 12px 30px; -fx-font-size: 16px; -fx-font-family: Arial; -fx-border-radius: 5px;";
-
+        passwordField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                login.fire();
+        });
         login.setStyle(buttonStyle);
         admin.setStyle(buttonStyle);
-        signupLabel.setOnMouseEntered(e->{
-            signupLabel.setStyle("-fx-text-fill: blue; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;");
-        });
+        signupLabel.setOnMouseEntered(e->signupLabel.setStyle("-fx-text-fill: blue; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;"));
         signupLabel.setOnMouseExited(e->signupLabel.setStyle("-fx-text-fill: black; -fx-font-size: 18px; -fx-font-family: Arial; -fx-font-weight: bold;"));
         login.setOnMouseEntered(e -> login.setStyle("-fx-background-color: #2980b9; -fx-text-fill: white; -fx-padding: 12px 30px; -fx-font-size: 16px; -fx-font-family: Arial; -fx-border-radius: 5px;"));
         login.setOnMouseExited(e -> login.setStyle(buttonStyle));
@@ -277,14 +278,20 @@ public class HelloApplication extends Application{
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(10);
+        vBox.setBackground(background());
+        vBox.setPrefWidth(1300);
+        vBox.setPrefHeight(800);
 
-        Label titleLabel = new Label("User Management");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        Label titleLabel = new Label("Buyers Management");
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+        titleLabel.setFont(new Font("Times New Roman", 56));
+        titleLabel.setPadding(new Insets(10, 10, 50, 10));
+        titleLabel.setAlignment(Pos.CENTER);
         vBox.getChildren().add(titleLabel);
 
 
-        TableView<User> userTable = new TableView<>();
-        userTable.setItems(loadUsers());
+        TableView<User> buyersTable = new TableView<>();
+        buyersTable.setItems(loadUsers());
 
         TableColumn<User, String> idColumn = new TableColumn<>("User ID");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("userId"));
@@ -292,16 +299,42 @@ public class HelloApplication extends Application{
         TableColumn<User, String> usernameColumn = new TableColumn<>("Username");
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
 
-        TableColumn<User, String> roleColumn = new TableColumn<>("Role");
-        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-
         TableColumn<User, String> emailColumn = new TableColumn<>("Email");
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
 
-        TableColumn<User, String> phoneColumn = new TableColumn<>("Phone");
+        TableColumn<User, String> phoneColumn = new TableColumn<>("Phone Number");
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
 
-        userTable.getColumns().addAll(idColumn, usernameColumn, roleColumn, emailColumn, phoneColumn);
+        TableColumn<User, String> locationColumn = new TableColumn<>("Preferred Location");
+        locationColumn.setCellValueFactory(new PropertyValueFactory<>("preferredLocation"));
+
+        TableColumn<User, Double> sizeColumn = new TableColumn<>("Preferred Size");
+        sizeColumn.setCellValueFactory(new PropertyValueFactory<>("preferredSize"));
+
+        TableColumn<User, Double> budgetColumn = new TableColumn<>("Budget");
+        budgetColumn.setCellValueFactory(new PropertyValueFactory<>("budget"));
+
+        idColumn.setPrefWidth(100);
+        usernameColumn.setPrefWidth(150);
+        emailColumn.setPrefWidth(200);
+        phoneColumn.setPrefWidth(150);
+        locationColumn.setPrefWidth(200);
+        sizeColumn.setPrefWidth(150);
+        budgetColumn.setPrefWidth(200);
+
+        buyersTable.setStyle("-fx-background-color: #f9f9f9; -fx-border-color: #ccc; -fx-border-radius: 5px;");
+
+        idColumn.setStyle("-fx-alignment: CENTER; -fx-font-size: 14px; -fx-font-family: Arial;");
+        usernameColumn.setStyle("-fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-font-family: Arial;");
+        emailColumn.setStyle("-fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-font-family: Arial;");
+        phoneColumn.setStyle("-fx-alignment: CENTER; -fx-font-size: 14px; -fx-font-family: Arial;");
+        locationColumn.setStyle("-fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-font-family: Arial;");
+        sizeColumn.setStyle("-fx-alignment: CENTER_RIGHT; -fx-font-size: 14px; -fx-font-family: Arial;");
+        budgetColumn.setStyle("-fx-alignment: CENTER_RIGHT; -fx-font-size: 14px; -fx-font-family: Arial;");
+
+        buyersTable.setPrefWidth(1000);
+        buyersTable.setPrefHeight(500);
+        buyersTable.getColumns().addAll(idColumn, usernameColumn, emailColumn, phoneColumn, locationColumn, sizeColumn, budgetColumn);
 
 
         Button addButton = new Button("Add User");
@@ -311,33 +344,118 @@ public class HelloApplication extends Application{
 
         addButton.setOnAction(e -> {
             Stage addStage = new Stage();
-            VBox addVBox = new VBox(10);
+            VBox addVBox = new VBox();
             addVBox.setAlignment(Pos.CENTER);
+            addVBox.setSpacing(15);
+            addVBox.setPadding(new Insets(10));
+            addVBox.setBackground(background());
+            GridPane inputGrid = new GridPane();
+            inputGrid.setAlignment(Pos.CENTER);
+            inputGrid.setHgap(10);
+            inputGrid.setVgap(15);
+            inputGrid.setPadding(new Insets(20, 30, 20, 20));
+            Label username = new Label("Username:");
+            Label password = new Label("Password:");
+            Label email = new Label("Email:");
+            Label phoneNumber = new Label("Phone Number:");
+            Label preferredLocation = new Label("Preferred Location:");
+            Label preferredSize = new Label("Preferred Size:");
+            Label budget = new Label("Budget:");
+
+            username.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+            password.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+            email.setStyle("-fx-text-fill:black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+            phoneNumber.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+            preferredLocation.setStyle("-fx-text-fill:black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+            preferredSize.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+            budget.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
 
             TextField usernameField = new TextField();
             usernameField.setPromptText("Username");
-
+            usernameField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+            usernameField.setPrefWidth(800);
             PasswordField passwordField = new PasswordField();
             passwordField.setPromptText("Password");
-
-            TextField roleField = new TextField();
-            roleField.setPromptText("Role (Admin/Buyer)");
-
+            passwordField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+            passwordField.setPrefWidth(800);
             TextField emailField = new TextField();
             emailField.setPromptText("Email");
-
-            TextField phoneField = new TextField();
-            phoneField.setPromptText("Phone Number");
+            emailField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+            emailField.setPrefWidth(800);
+            TextField phoneNumberField = new TextField();
+            phoneNumberField.setPromptText("Phone number");
+            phoneNumberField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+            phoneNumberField.setPrefWidth(800);
+            TextField preferredLocationField = new TextField();
+            preferredLocationField.setPromptText("Preferred Plot Location");
+            preferredLocationField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+            preferredLocationField.setPrefWidth(800);
+            TextField preferredSizeField = new TextField();
+            preferredSizeField.setPromptText("Preferred Plot Size");
+            preferredSizeField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+            preferredSizeField.setPrefWidth(800);
+            TextField budgetField = new TextField();
+            budgetField.setPromptText("Budget");
+            budgetField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+            budgetField.setPrefWidth(800);
 
             Button saveButton = new Button("Save");
             saveButton.setOnAction(event -> {
-                ObservableList<User> users = userTable.getItems();
-                users.add(new User(usernameField.getText(), passwordField.getText(), roleField.getText(), emailField.getText(), phoneField.getText()));
-                saveUsers(users);
+                ObservableList<User> buyers = buyersTable.getItems();
+                buyers.add(new Buyer(usernameField.getText(), passwordField.getText(), emailField.getText(), phoneNumberField.getText(), preferredLocationField.getText(), Double.parseDouble(preferredSizeField.getText()), Double.parseDouble(budgetField.getText())));
+                saveUsers(buyers);
                 addStage.close();
             });
+            saveButton.setPrefSize(100, 60);
+            saveButton.setStyle("-fx-font-size: 14px; -fx-text-fill: white; -fx-background-color: green;");
 
-            addVBox.getChildren().addAll(usernameField, passwordField, roleField, emailField, phoneField, saveButton);
+            inputGrid.add(username, 0, 0);
+            inputGrid.add(usernameField, 1,0);
+            inputGrid.add(password, 0, 1);
+            inputGrid.add(passwordField,1,1);
+            inputGrid.add(email,0, 2);
+            inputGrid.add(emailField, 1, 2);
+            inputGrid.add(phoneNumber,0,3);
+            inputGrid.add(phoneNumberField,1,3);
+            inputGrid.add(preferredLocation,0, 4);
+            inputGrid.add(preferredLocationField,1, 4);
+            inputGrid.add(preferredSize,0,5);
+            inputGrid.add(preferredSizeField,1,5);
+            inputGrid.add(budget,0,6);
+            inputGrid.add(budgetField,1,6);
+
+            usernameField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    passwordField.requestFocus();
+            });
+            passwordField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    emailField.requestFocus();
+            });
+            emailField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    phoneNumberField.requestFocus();
+            });
+            phoneNumberField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    preferredLocationField.requestFocus();
+            });
+
+            preferredLocationField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    preferredSizeField.requestFocus();
+            });
+            preferredSizeField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    budgetField.requestFocus();
+            });
+            budgetField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    saveButton.fire();
+            });
+
+
+            addVBox.getChildren().addAll(inputGrid, saveButton);
             addStage.setScene(new Scene(addVBox, 1300, 800));
             addStage.setTitle("Add User");
             addStage.show();
@@ -345,32 +463,101 @@ public class HelloApplication extends Application{
 
 
         editButton.setOnAction(e -> {
-            User selectedUser = userTable.getSelectionModel().getSelectedItem();
-            if (selectedUser != null) {
+            Buyer selectedBuyer = (Buyer) buyersTable.getSelectionModel().getSelectedItem();
+            if (selectedBuyer != null) {
                 Stage editStage = new Stage();
-                VBox editVBox = new VBox(10);
+                VBox editVBox = new VBox();
                 editVBox.setAlignment(Pos.CENTER);
+                editVBox.setSpacing(15);
+                editVBox.setPadding(new Insets(10));
+                editVBox.setBackground(background());
+                GridPane inputGrid = new GridPane();
+                inputGrid.setAlignment(Pos.CENTER);
+                inputGrid.setHgap(10);
+                inputGrid.setVgap(15);
+                inputGrid.setPadding(new Insets(20, 30, 20, 20));
 
-                TextField emailField = new TextField(selectedUser.getEmail());
+                Label email = new Label("Email:");
+                Label phoneNumber = new Label("Phone Number:");
+                Label preferredLocation = new Label("Preferred Location:");
+                Label preferredSize = new Label("Preferred Size:");
+                Label budget = new Label("Budget:");
+
+                email.setStyle("-fx-text-fill:black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+                phoneNumber.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+                preferredLocation.setStyle("-fx-text-fill:black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+                preferredSize.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+                budget.setStyle("-fx-text-fill: black; -fx-font-size: 20px; -fx-font-family: Arial; -fx-font-weight: bold;");
+
+                TextField emailField = new TextField();
                 emailField.setPromptText("Email");
+                emailField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+                emailField.setPrefWidth(800);
+                TextField phoneNumberField = new TextField();
+                phoneNumberField.setPromptText("Phone number");
+                phoneNumberField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+                phoneNumberField.setPrefWidth(800);
+                TextField preferredLocationField = new TextField();
+                preferredLocationField.setPromptText("Preferred Plot Location");
+                preferredLocationField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+                preferredLocationField.setPrefWidth(800);
+                TextField preferredSizeField = new TextField();
+                preferredSizeField.setPromptText("Preferred Plot Size");
+                preferredSizeField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+                preferredSizeField.setPrefWidth(800);
+                TextField budgetField = new TextField();
+                budgetField.setPromptText("Budget");
+                budgetField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
+                budgetField.setPrefWidth(800);
 
-                TextField phoneField = new TextField(selectedUser.getPhoneNumber());
-                phoneField.setPromptText("Phone Number");
-
-                TextField roleField = new TextField(selectedUser.getRole());
-                roleField.setPromptText("Role (Admin/Buyer)");
 
                 Button saveButton = new Button("Save Changes");
                 saveButton.setOnAction(event -> {
-                    selectedUser.setEmail(emailField.getText());
-                    selectedUser.setPhoneNumber(phoneField.getText());
-                    selectedUser.setRole(roleField.getText());
-                    userTable.refresh();
-                    saveUsers(userTable.getItems());
+                    selectedBuyer.setEmail(emailField.getText());
+                    selectedBuyer.setPhoneNumber(phoneNumberField.getText());
+                    selectedBuyer.setPreferredLocation(preferredLocationField.getText());
+                    selectedBuyer.setPreferredSize(Double.parseDouble(preferredSizeField.getText()));
+                    selectedBuyer.setBudget(Double.parseDouble(budgetField.getText()));
+                    buyersTable.refresh();
+                    saveUsers(buyersTable.getItems());
                     editStage.close();
                 });
+                inputGrid.add(email,0, 2);
+                inputGrid.add(emailField, 1, 2);
+                inputGrid.add(phoneNumber,0,3);
+                inputGrid.add(phoneNumberField,1,3);
+                inputGrid.add(preferredLocation,0, 4);
+                inputGrid.add(preferredLocationField,1, 4);
+                inputGrid.add(preferredSize,0,5);
+                inputGrid.add(preferredSizeField,1,5);
+                inputGrid.add(budget,0,6);
+                inputGrid.add(budgetField,1,6);
 
-                editVBox.getChildren().addAll(emailField, phoneField, roleField, saveButton);
+                emailField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        phoneNumberField.requestFocus();
+                });
+                phoneNumberField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        preferredLocationField.requestFocus();
+                });
+
+                preferredLocationField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        preferredSizeField.requestFocus();
+                });
+                preferredSizeField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        budgetField.requestFocus();
+                });
+                budgetField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        saveButton.fire();
+                });
+
+                editVBox.getChildren().addAll(inputGrid, saveButton);
+                saveButton.setPrefSize(100, 60);
+                saveButton.setStyle("-fx-font-size: 14px; -fx-text-fill: white; -fx-background-color: green;");
                 editStage.setScene(new Scene(editVBox, 1300, 800));
                 editStage.setTitle("Edit User");
                 editStage.show();
@@ -379,10 +566,10 @@ public class HelloApplication extends Application{
 
 
         deleteButton.setOnAction(e -> {
-            User selectedUser = userTable.getSelectionModel().getSelectedItem();
+            User selectedUser = buyersTable.getSelectionModel().getSelectedItem();
             if (selectedUser != null) {
-                userTable.getItems().remove(selectedUser);
-                saveUsers(userTable.getItems());
+                buyersTable.getItems().remove(selectedUser);
+                saveUsers(buyersTable.getItems());
             }
         });
 
@@ -390,11 +577,21 @@ public class HelloApplication extends Application{
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> adminDashboardScene(stage));
 
+        addButton.setPrefSize(100, 60);
+        editButton.setPrefSize(100, 60);
+        deleteButton.setPrefSize(100, 60);
+
+        addButton.setStyle("-fx-text-fill: white; -fx-background-color: lightblue; -fx-font-size: 16px;");
+        editButton.setStyle("-fx-text-fill: white; -fx-background-color: lightblue; -fx-font-size: 16px;");
+        deleteButton.setStyle("-fx-text-fill: white; -fx-background-color: lightblue; -fx-font-size: 16px;");
+
+        backButton.setPrefSize(100, 60);
+        backButton.setStyle("-fx-fill-text: white; -fx-background-color: green; -fx-font-size: 16px;");
 
         HBox buttonBox = new HBox(10, addButton, editButton, deleteButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        vBox.getChildren().addAll(userTable, buttonBox, backButton);
+        vBox.getChildren().addAll(buyersTable, buttonBox, backButton);
 
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
@@ -405,9 +602,13 @@ public class HelloApplication extends Application{
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(10);
+        vBox.setBackground(background());
 
-        Label titleLabel = new Label("Plot Management");
+        Label titleLabel = new Label("Plots Management");
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        titleLabel.setFont(new Font("Times New Roman", 56));
+        titleLabel.setPadding(new Insets(10, 10, 50, 10));
+        titleLabel.setAlignment(Pos.CENTER);
         vBox.getChildren().add(titleLabel);
 
 
@@ -420,34 +621,34 @@ public class HelloApplication extends Application{
         TableColumn<Plot, String> numberColumn = new TableColumn<>("Plot Number");
         numberColumn.setCellValueFactory(new PropertyValueFactory<>("plotNumber"));
 
-        TableColumn<Plot, Double> lengthColumn = new TableColumn<>("Length");
+        TableColumn<Plot, Double> lengthColumn = new TableColumn<>("Length (ft)");
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("length"));
 
-        TableColumn<Plot, Double> widthColumn = new TableColumn<>("Width");
+        TableColumn<Plot, Double> widthColumn = new TableColumn<>("Width (ft)");
         widthColumn.setCellValueFactory(new PropertyValueFactory<>("width"));
 
-        TableColumn<Plot, Double> areaColumn = new TableColumn<>("Total Area");
+        TableColumn<Plot, Double> areaColumn = new TableColumn<>("Total Area (Marla)");
         areaColumn.setCellValueFactory(new PropertyValueFactory<>("totalArea"));
 
         TableColumn<Plot, String> locationColumn = new TableColumn<>("Location");
         locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
 
-        TableColumn<Plot, String> gpsColumn = new TableColumn<>("GPS Coordinates");
-        gpsColumn.setCellValueFactory(new PropertyValueFactory<>("gpsCoordinates"));
+        TableColumn<Plot, String> typeColumn = new TableColumn<>("Plot Type");
+        typeColumn.setCellValueFactory(new PropertyValueFactory<>("plotType"));
+
+        TableColumn<Plot, String> categoryColumn = new TableColumn<>("Plot Category");
+        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("plotCategory"));
 
         TableColumn<Plot, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        TableColumn<Plot, Double> priceUnitColumn = new TableColumn<>("Price Per Unit");
-        priceUnitColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerUnit"));
+        TableColumn<Plot, Double> marlaColumn = new TableColumn<>("Price Per Marla");
+        marlaColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerMarla"));
 
         TableColumn<Plot, Double> priceColumn = new TableColumn<>("Total Price");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
 
-        TableColumn<Plot, String> developmentColumn = new TableColumn<>("Development Status");
-        developmentColumn.setCellValueFactory(new PropertyValueFactory<>("developmentStatus"));
-
-        plotTable.getColumns().addAll(idColumn, numberColumn, lengthColumn, widthColumn, areaColumn, locationColumn, gpsColumn, statusColumn, priceUnitColumn, priceColumn, developmentColumn);
+        plotTable.getColumns().addAll(idColumn, numberColumn, lengthColumn, widthColumn, areaColumn, locationColumn, typeColumn, categoryColumn, marlaColumn,  priceColumn, statusColumn);
 
 
         Button addButton = new Button("Add Plot");
@@ -459,40 +660,55 @@ public class HelloApplication extends Application{
             Stage addStage = new Stage();
             VBox addVBox = new VBox(10);
             addVBox.setAlignment(Pos.CENTER);
+            addVBox.setSpacing(15);
+            addVBox.setPadding(new Insets(10));
+            addVBox.setBackground(background());
+            GridPane inputGrid = new GridPane();
+            inputGrid.setAlignment(Pos.CENTER);
+            inputGrid.setHgap(10);
+            inputGrid.setVgap(15);
+            inputGrid.setPadding(new Insets(20, 30, 20, 20));
+
+            Label plotNumber = new Label("Plot Number: ");
+            Label length = new Label("Length: ");
+            Label width = new Label("Width: ");
+            Label location = new Label("Location: ");
+            Label type = new Label("Plot Type: ");
+            Label category = new Label("Plot Category: ");
+            Label pricePerMarla = new Label("Price Per Marla: ");
+            Label status = new Label("Status: ");
 
             TextField numberField = new TextField();
             numberField.setPromptText("Plot Number");
 
             TextField lengthField = new TextField();
-            lengthField.setPromptText("Length");
+            lengthField.setPromptText("Length (ft.)");
 
             TextField widthField = new TextField();
-            widthField.setPromptText("Width");
+            widthField.setPromptText("Width(ft.)");
 
             TextField locationField = new TextField();
             locationField.setPromptText("Location");
 
-            TextField gpsField = new TextField();
-            gpsField.setPromptText("GPS Coordinates");
+            TextField typeField = new TextField();
+            typeField.setPromptText("Plot Type (Commercial/ Residential)");
 
             TextField statusField = new TextField();
             statusField.setPromptText("Status");
 
             TextField priceUnitField = new TextField();
-            priceUnitField.setPromptText("Price Per Unit");
+            priceUnitField.setPromptText("Price Per Marla");
 
-            TextField developmentField = new TextField();
-            developmentField.setPromptText("Development Status");
+            TextField categoryField = new TextField();
+            categoryField.setPromptText("Plot Category (Corner, Park Facing, etc)");
 
             Button saveButton = new Button("Save");
             saveButton.setOnAction(event -> {
                 try {
                     int newId = plotTable.getItems().size() + 1;
-                    double length = Double.parseDouble(lengthField.getText());
-                    double width = Double.parseDouble(widthField.getText());
-                    double pricePerUnit = Double.parseDouble(priceUnitField.getText());
-
-                    Plot newPlot = new Plot(newId, numberField.getText(), length, width, locationField.getText(), gpsField.getText(), statusField.getText(), pricePerUnit, developmentField.getText());
+                    double area = Double.parseDouble(lengthField.getText())* Double.parseDouble(widthField.getText()) * 0.00367309;
+                    double price = Double.parseDouble(priceUnitField.getText())* area;
+                    Plot newPlot = new Plot(newId, numberField.getText(),Double.parseDouble(lengthField.getText()),Double.parseDouble(widthField.getText()), area, locationField.getText(), typeField.getText(), categoryField.getText(), Double.parseDouble(priceUnitField.getText()), price, statusField.getText());
                     ObservableList<Plot> plots = plotTable.getItems();
                     plots.add(newPlot);
                     savePlots(plots);
@@ -502,7 +718,61 @@ public class HelloApplication extends Application{
                 }
             });
 
-            addVBox.getChildren().addAll(numberField, lengthField, widthField, locationField, gpsField, statusField, priceUnitField, developmentField, saveButton);
+            inputGrid.add(plotNumber, 0, 0);
+            inputGrid.add(numberField, 1,0);
+            inputGrid.add(length, 0, 1);
+            inputGrid.add(lengthField,1,1);
+            inputGrid.add(width,0, 2);
+            inputGrid.add(widthField, 1, 2);
+            inputGrid.add(location,0,3);
+            inputGrid.add(locationField,1,3);
+            inputGrid.add(type,0, 4);
+            inputGrid.add(typeField,1, 4);
+            inputGrid.add(category,0,5);
+            inputGrid.add(categoryField,1,5);
+            inputGrid.add(pricePerMarla,0,6);
+            inputGrid.add(priceUnitField,1,6);
+            inputGrid.add(status,0, 7);
+            inputGrid.add(statusField, 1, 7);
+
+            numberField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    lengthField.requestFocus();
+            });
+            lengthField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    widthField.requestFocus();
+            });
+            widthField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    locationField.requestFocus();
+            });
+            locationField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    typeField.requestFocus();
+            });
+
+            typeField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    categoryField.requestFocus();
+            });
+            categoryField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    priceUnitField.requestFocus();
+            });
+
+            priceUnitField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    statusField.requestFocus();
+            });
+
+            statusField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    saveButton.fire();
+            });
+
+
+            addVBox.getChildren().addAll(inputGrid, saveButton);
             addStage.setScene(new Scene(addVBox, 1300, 800));
             addStage.setTitle("Add Plot");
             addStage.show();
@@ -515,7 +785,23 @@ public class HelloApplication extends Application{
                 Stage editStage = new Stage();
                 VBox editVBox = new VBox(10);
                 editVBox.setAlignment(Pos.CENTER);
+                editVBox.setSpacing(15);
+                editVBox.setPadding(new Insets(10));
+                editVBox.setBackground(background());
+                GridPane inputGrid = new GridPane();
+                inputGrid.setAlignment(Pos.CENTER);
+                inputGrid.setHgap(10);
+                inputGrid.setVgap(15);
+                inputGrid.setPadding(new Insets(20, 30, 20, 20));
 
+                Label plotNumber = new Label("Plot Number: ");
+                Label length = new Label("Length: ");
+                Label width = new Label("Width: ");
+                Label location = new Label("Location: ");
+                Label type = new Label("Plot Type: ");
+                Label category = new Label("Plot Category: ");
+                Label pricePerMarla = new Label("Price Per Marla: ");
+                Label status = new Label("Status: ");
                 TextField numberField = new TextField(selectedPlot.getPlotNumber());
                 numberField.setPromptText("Plot Number");
 
@@ -528,17 +814,17 @@ public class HelloApplication extends Application{
                 TextField locationField = new TextField(selectedPlot.getLocation());
                 locationField.setPromptText("Location");
 
-                TextField gpsField = new TextField(selectedPlot.getGpsCoordinates());
-                gpsField.setPromptText("GPS Coordinates");
+                TextField typeField = new TextField(selectedPlot.getPlotType());
+                typeField.setPromptText("GPS Coordinates");
 
                 TextField statusField = new TextField(selectedPlot.getStatus());
                 statusField.setPromptText("Status");
 
-                TextField priceUnitField = new TextField(String.valueOf(selectedPlot.getPricePerUnit()));
-                priceUnitField.setPromptText("Price Per Unit");
+                TextField priceUnitField = new TextField(String.valueOf(selectedPlot.getPricePerMarla()));
+                priceUnitField.setPromptText("Price Per Marla");
 
-                TextField developmentField = new TextField(selectedPlot.getDevelopmentStatus());
-                developmentField.setPromptText("Development Status");
+                TextField categoryField = new TextField(selectedPlot.getPlotCategory());
+                categoryField.setPromptText("Development Status");
 
                 Button saveButton = new Button("Save Changes");
                 saveButton.setOnAction(event -> {
@@ -547,12 +833,12 @@ public class HelloApplication extends Application{
                         selectedPlot.setLength(Double.parseDouble(lengthField.getText()));
                         selectedPlot.setWidth(Double.parseDouble(widthField.getText()));
                         selectedPlot.setLocation(locationField.getText());
-                        selectedPlot.setGpsCoordinates(gpsField.getText());
+                        selectedPlot.setPlotType(typeField.getText());
                         selectedPlot.setStatus(statusField.getText());
-                        selectedPlot.setPricePerUnit(Double.parseDouble(priceUnitField.getText()));
-                        selectedPlot.setTotalArea(selectedPlot.getLength() * selectedPlot.getWidth());
-                        selectedPlot.setTotalPrice(selectedPlot.getTotalArea() * selectedPlot.getPricePerUnit());
-                        selectedPlot.setDevelopmentStatus(developmentField.getText());
+                        selectedPlot.setPricePerMarla(Double.parseDouble(priceUnitField.getText()));
+                        selectedPlot.setTotalArea(selectedPlot.getLength() * selectedPlot.getWidth()* 0.00367309);
+                        selectedPlot.setTotalPrice(selectedPlot.getTotalArea() * selectedPlot.getPricePerMarla());
+                        selectedPlot.setPlotCategory(categoryField.getText());
 
                         plotTable.refresh();
                         savePlots(plotTable.getItems());
@@ -562,7 +848,60 @@ public class HelloApplication extends Application{
                     }
                 });
 
-                editVBox.getChildren().addAll(numberField, lengthField, widthField, locationField, gpsField, statusField, priceUnitField, developmentField, saveButton);
+                inputGrid.add(plotNumber, 0, 0);
+                inputGrid.add(numberField, 1,0);
+                inputGrid.add(length, 0, 1);
+                inputGrid.add(lengthField,1,1);
+                inputGrid.add(width,0, 2);
+                inputGrid.add(widthField, 1, 2);
+                inputGrid.add(location,0,3);
+                inputGrid.add(locationField,1,3);
+                inputGrid.add(type,0, 4);
+                inputGrid.add(typeField,1, 4);
+                inputGrid.add(category,0,5);
+                inputGrid.add(categoryField,1,5);
+                inputGrid.add(pricePerMarla,0,6);
+                inputGrid.add(priceUnitField,1,6);
+                inputGrid.add(status,0, 7);
+                inputGrid.add(statusField, 1, 7);
+
+                numberField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        lengthField.requestFocus();
+                });
+                lengthField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        widthField.requestFocus();
+                });
+                widthField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        locationField.requestFocus();
+                });
+                locationField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        typeField.requestFocus();
+                });
+
+                typeField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        categoryField.requestFocus();
+                });
+                categoryField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        priceUnitField.requestFocus();
+                });
+
+                priceUnitField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        statusField.requestFocus();
+                });
+
+                statusField.setOnKeyPressed(event->{
+                    if(event.getCode().toString().equals("ENTER"))
+                        saveButton.fire();
+                });
+
+                editVBox.getChildren().addAll(inputGrid, saveButton);
                 editStage.setScene(new Scene(editVBox, 1300, 800));
                 editStage.setTitle("Edit Plot");
                 editStage.show();
@@ -600,13 +939,96 @@ public class HelloApplication extends Application{
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> adminDashboardScene(stage));
 
+        ObservableList<Payment> payments = loadPayments();
+
+        // ListView for displaying payments
         ListView<Payment> paymentListView = new ListView<>();
-        paymentListView.getItems().setAll(loadPayments());
+        paymentListView.setItems(payments);
 
         Button addPaymentButton = new Button("Add Payment");
         addPaymentButton.setOnAction(e -> {
 
-            System.out.println("Adding a new payment...");
+            Stage addStage = new Stage();
+            VBox addVBox = new VBox(10);
+            addVBox.setAlignment(Pos.CENTER);
+            addVBox.setSpacing(15);
+            addVBox.setPadding(new Insets(10));
+            addVBox.setBackground(background());
+            GridPane inputGrid = new GridPane();
+            inputGrid.setAlignment(Pos.CENTER);
+            inputGrid.setHgap(10);
+            inputGrid.setVgap(15);
+            inputGrid.setPadding(new Insets(20, 30, 20, 20));
+
+            Label plotId = new Label("Plot ID: ");
+            Label buyerId = new Label("Buyer ID: ");
+            Label amount = new Label("Amount Paid: ");
+            Label paymentMethod = new Label("Payment Method: ");
+
+            TextField plotIdField= new TextField();
+            plotIdField.setPromptText("Plot ID");
+
+            TextField buyerIdField = new TextField();
+            buyerIdField.setPromptText("Buyer ID");
+
+            TextField amountField = new TextField();
+            amountField.setPromptText("Paid Amount");
+
+            TextField methodField = new TextField();
+            methodField.setPromptText("Payment Method");
+
+            Button saveButton = new Button("Save");
+            saveButton.setOnAction(event -> {
+                try {
+                    int newId = loadPayments().size() + 1;
+                    double totalPrice = 0;
+                    ObservableList<Plot> plots = loadPlots();
+                    for(Plot plot: plots){
+                        if(plot.getPlotId()==Integer.parseInt(plotIdField.getText())){
+                            totalPrice = plot.getTotalPrice();
+                            break;
+                        }
+                    }
+                    double outstandingBalance = totalPrice- Double.parseDouble(amountField.getText());
+                    Payment newPayment = new Payment(newId, Integer.parseInt(plotIdField.getText()),Integer.parseInt(buyerIdField.getText()),Double.parseDouble(amountField.getText()), methodField.getText(),outstandingBalance, LocalDate.now());
+                    payments.add(newPayment);
+                    savePayments(payments);
+                    addStage.close();
+                } catch (NumberFormatException ex) {
+                    System.out.println("Invalid input values.");
+                }
+            });
+
+            inputGrid.add(plotId, 0, 0);
+            inputGrid.add(plotIdField, 1,0);
+            inputGrid.add(buyerId, 0, 1);
+            inputGrid.add(buyerIdField,1,1);
+            inputGrid.add(amount,0, 2);
+            inputGrid.add(amountField, 1, 2);
+            inputGrid.add(paymentMethod,0,3);
+            inputGrid.add(methodField,1,3);
+
+            plotIdField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    buyerIdField.requestFocus();
+            });
+            buyerIdField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    amountField.requestFocus();
+            });
+            amountField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    methodField.requestFocus();
+            });
+            methodField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    saveButton.fire();
+            });
+
+            addVBox.getChildren().addAll(inputGrid, saveButton);
+            addStage.setScene(new Scene(addVBox, 1300, 800));
+            addStage.setTitle("Add Plot");
+            addStage.show();
         });
 
 
@@ -614,11 +1036,9 @@ public class HelloApplication extends Application{
         removePaymentButton.setOnAction(e -> {
             Payment selectedPayment = paymentListView.getSelectionModel().getSelectedItem();
             if (selectedPayment != null) {
-                ObservableList<Payment> payments = loadPayments();
                 payments.remove(selectedPayment);
                 savePayments(payments);
                 paymentListView.getItems().setAll(loadPayments());
-                System.out.println("Payment removed: " + selectedPayment);
             } else {
                 System.out.println("Please select a payment to remove.");
             }
@@ -629,8 +1049,78 @@ public class HelloApplication extends Application{
         updatePaymentButton.setOnAction(e -> {
             Payment selectedPayment = paymentListView.getSelectionModel().getSelectedItem();
             if (selectedPayment != null) {
+                Stage updateStage = new Stage();
+                VBox updateVBox = new VBox(10);
+                updateVBox.setAlignment(Pos.CENTER);
+                updateVBox.setSpacing(15);
+                updateVBox.setPadding(new Insets(10));
+                updateVBox.setBackground(background());
 
-                System.out.println("Updating payment: " + selectedPayment);
+                GridPane inputGrid = new GridPane();
+                inputGrid.setAlignment(Pos.CENTER);
+                inputGrid.setHgap(10);
+                inputGrid.setVgap(15);
+                inputGrid.setPadding(new Insets(20, 30, 20, 20));
+
+                Label plotIdLabel = new Label("Plot ID: ");
+                Label buyerIdLabel = new Label("Buyer ID: ");
+                Label amountLabel = new Label("Amount Paid: ");
+                Label methodLabel = new Label("Payment Method: ");
+
+                TextField plotIdField = new TextField(String.valueOf(selectedPayment.getPlotId()));
+                TextField buyerIdField = new TextField(String.valueOf(selectedPayment.getBuyerId()));
+                TextField amountField = new TextField(String.valueOf(selectedPayment.getAmountPaid()));
+                TextField methodField = new TextField(selectedPayment.getPaymentMethod());
+
+                Button saveButton = new Button("Save Changes");
+                saveButton.setOnAction(event -> {
+                    try {
+                        int newPlotId = Integer.parseInt(plotIdField.getText());
+                        int newBuyerId = Integer.parseInt(buyerIdField.getText());
+                        double newAmountPaid = Double.parseDouble(amountField.getText());
+                        String newMethod = methodField.getText();
+
+                        // Update the selected payment with new values
+                        selectedPayment.setPlotId(newPlotId);
+                        selectedPayment.setBuyerId(newBuyerId);
+                        selectedPayment.setAmountPaid(newAmountPaid);
+                        selectedPayment.setPaymentMethod(newMethod);
+
+                        // Recalculate outstanding balance
+                        double totalPrice = 0;
+                        ObservableList<Plot> plots = loadPlots();
+                        for (Plot plot : plots) {
+                            if (plot.getPlotId() == newPlotId) {
+                                totalPrice = plot.getTotalPrice();
+                                break;
+                            }
+                        }
+                        selectedPayment.setOutstandingBalance(totalPrice - newAmountPaid);
+
+                        // Refresh the ListView
+                        paymentListView.refresh();
+
+                        // Save the updated list
+                        savePayments(payments);
+                        updateStage.close();
+                    } catch (NumberFormatException ex) {
+                        System.out.println("Invalid input values.");
+                    }
+                });
+
+                inputGrid.add(plotIdLabel, 0, 0);
+                inputGrid.add(plotIdField, 1, 0);
+                inputGrid.add(buyerIdLabel, 0, 1);
+                inputGrid.add(buyerIdField, 1, 1);
+                inputGrid.add(amountLabel, 0, 2);
+                inputGrid.add(amountField, 1, 2);
+                inputGrid.add(methodLabel, 0, 3);
+                inputGrid.add(methodField, 1, 3);
+
+                updateVBox.getChildren().addAll(inputGrid, saveButton);
+                updateStage.setScene(new Scene(updateVBox, 600, 400));
+                updateStage.setTitle("Update Payment");
+                updateStage.show();
             } else {
                 System.out.println("Please select a payment to update.");
             }
@@ -639,34 +1129,146 @@ public class HelloApplication extends Application{
 
         layout.getChildren().addAll(paymentListView, addPaymentButton, removePaymentButton, updatePaymentButton,backButton);
 
-
         Scene scene = new Scene(layout, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Manage Payments");
         stage.show();
     }
-    public static void generateReportScene(Stage stage){
+    //public void generateReportScene(Stage stage){
+//        VBox layout = new VBox(10);
+//        layout.setPadding(new Insets(10));
+//
+//
+//        String report = generateReports();
+//        String plotStatistics = analyzePlotStatistics();
+//
+//
+//        final TextArea reportTextArea = new TextArea(report + "\n\n" + plotStatistics);
+//        reportTextArea.setEditable(false);
+//        reportTextArea.setWrapText(true);
+//
+//
+//        Button printButton = new Button("Print Report");
+//        reportTextArea.setEditable(false);
+//
+//
+//        reportTextArea.setText(report);
+//
+//        printButton.setOnAction(e -> {
+//
+//            String contentToPrint = reportTextArea.getText();
+//            if (!contentToPrint.isEmpty()) {
+//                print(contentToPrint);
+//            } else {
+//                Alert alert = new Alert(Alert.AlertType.WARNING, "No report to print!");
+//                alert.show();
+//            }
+//        });
+//
+//
+//        Button closeButton = new Button("Close");
+//        closeButton.setOnAction(e -> {
+//            stage.close();
+//        });
+//
+//
+//        layout.getChildren().addAll(reportTextArea, printButton, closeButton);
+//
+//
+//        Scene scene = new Scene(layout, 1300, 800);
+//        stage.setScene(scene);
+//        stage.setTitle("Generate Report");
+//        stage.show();
+//    }
+    public void generateReportScene(Stage stage) {
+
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
 
+        ObservableList<Plot> plots = loadPlots();
+// Count plot types, statuses, and categories
+        int residentialCount = 0;
+        int commercialCount = 0;
+        int availableCount = 0;
+        int reservedCount = 0;
+        int soldCount = 0;
 
+        int cornerCount = 0;
+        int parkFacingCount = 0;
+        int mainBoulevardCount = 0;
+
+        for (Plot plot : plots) {
+            // Count plot types
+            if ("Residential".equalsIgnoreCase(plot.getPlotType())) {
+                residentialCount++;
+            } else if ("Commercial".equalsIgnoreCase(plot.getPlotType())) {
+                commercialCount++;
+            }
+
+            // Count plot statuses
+            if ("Available".equalsIgnoreCase(plot.getStatus())) {
+                availableCount++;
+            } else if ("Reserved".equalsIgnoreCase(plot.getStatus())) {
+                reservedCount++;
+            } else if ("Sold".equalsIgnoreCase(plot.getStatus())) {
+                soldCount++;
+            }
+
+            // Count plot categories
+            if ("Corner".equalsIgnoreCase(plot.getPlotCategory())) {
+                cornerCount++;
+            } else if ("Park-Facing".equalsIgnoreCase(plot.getPlotCategory())) {
+                parkFacingCount++;
+            } else if ("Main Boulevard".equalsIgnoreCase(plot.getPlotCategory())) {
+                mainBoulevardCount++;
+            }
+        }
+        // Load data and generate reports
         String report = generateReports();
         String plotStatistics = analyzePlotStatistics();
 
-
+        // Create a TextArea for textual reports
         final TextArea reportTextArea = new TextArea(report + "\n\n" + plotStatistics);
         reportTextArea.setEditable(false);
         reportTextArea.setWrapText(true);
 
+        // Create a PieChart for plot types
+        PieChart plotTypeChart = new PieChart();
+        plotTypeChart.setTitle("Plot Type Distribution");
+        plotTypeChart.getData().addAll(
+                new PieChart.Data("Residential", residentialCount),
+                new PieChart.Data("Commercial", commercialCount)
+        );
 
+
+        // Create a PieChart for plot statuses
+        PieChart plotStatusChart = new PieChart();
+        plotStatusChart.setTitle("Plot Status Distribution");
+        plotStatusChart.getData().addAll(
+                new PieChart.Data("Available", availableCount),
+                new PieChart.Data("Reserved", reservedCount),
+                new PieChart.Data("Sold", soldCount)
+        );
+
+        // Create a BarChart for plot categories
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        BarChart<String, Number> plotCategoryChart = new BarChart<>(xAxis, yAxis);
+        plotCategoryChart.setTitle("Plot Category Distribution");
+        xAxis.setLabel("Category");
+        yAxis.setLabel("Count");
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Categories");
+        series.getData().addAll(
+                new XYChart.Data<>("Corner", cornerCount),
+                new XYChart.Data<>("Park-Facing", parkFacingCount),
+                new XYChart.Data<>("Main Boulevard", mainBoulevardCount)
+        );
+        plotCategoryChart.getData().add(series);
+
+        // Add a Print Button
         Button printButton = new Button("Print Report");
-        reportTextArea.setEditable(false);
-
-
-        reportTextArea.setText(report);
-
         printButton.setOnAction(e -> {
-
             String contentToPrint = reportTextArea.getText();
             if (!contentToPrint.isEmpty()) {
                 print(contentToPrint);
@@ -676,21 +1278,31 @@ public class HelloApplication extends Application{
             }
         });
 
-
+        // Add a Close Button
         Button closeButton = new Button("Close");
         closeButton.setOnAction(e -> {
             stage.close();
         });
 
-
-        layout.getChildren().addAll(reportTextArea, printButton, closeButton);
-
+        // Combine elements in layout
+        layout.getChildren().addAll(
+                reportTextArea,
+                new Label("Plot Type Distribution"),
+                plotTypeChart,
+                new Label("Plot Status Distribution"),
+                plotStatusChart,
+                new Label("Plot Category Distribution"),
+                plotCategoryChart,
+                printButton,
+                closeButton
+        );
 
         Scene scene = new Scene(layout, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Generate Report");
         stage.show();
     }
+
     private static void print(String content) {
 
         PrinterJob printerJob = PrinterJob.createPrinterJob();
@@ -888,12 +1500,17 @@ public class HelloApplication extends Application{
         passwordField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
         passwordField.setPrefWidth(500);
 
+
+        Button login = new Button("Login");
+
         usernameField.setOnKeyPressed(e->{
             if(e.getCode().toString().equals("ENTER"))
                 passwordField.requestFocus();
         });
-
-        Button login = new Button("Login");
+        passwordField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                login.fire();
+        });
 
         String buttonStyle = "-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 12px 30px; -fx-font-size: 16px; -fx-font-family: Arial; -fx-border-radius: 5px;";
 
@@ -1034,10 +1651,7 @@ public class HelloApplication extends Application{
             if(e.getCode().toString().equals("ENTER"))
                 preferredLocationField.requestFocus();
         });
-        usernameField.setOnKeyPressed(e->{
-            if(e.getCode().toString().equals("ENTER"))
-                passwordField.requestFocus();
-        });
+
         preferredLocationField.setOnKeyPressed(e->{
             if(e.getCode().toString().equals("ENTER"))
                 preferredSizeField.requestFocus();
@@ -1046,13 +1660,17 @@ public class HelloApplication extends Application{
             if(e.getCode().toString().equals("ENTER"))
                 budgetField.requestFocus();
         });
+        budgetField.setOnKeyPressed(e->{
+            if(e.getCode().toString().equals("ENTER"))
+                register.fire();
+        });
 
         buttonBox.setSpacing(15);
         buttonBox.setAlignment(Pos.CENTER);
         register.setOnAction(e -> {
             List<User> users = loadUsers();
             List<Buyer> buyers = loadBuyers();
-            Buyer buyer = new Buyer(usernameField.getText(), passwordField.getText(), "Buyer", emailField.getText(), phoneNumberField.getText(), preferredLocationField.getText(), Double.parseDouble(preferredSizeField.getText()), Double.parseDouble(budgetField.getText()));
+            Buyer buyer = new Buyer(usernameField.getText(), passwordField.getText(), emailField.getText(), phoneNumberField.getText(), preferredLocationField.getText(), Double.parseDouble(preferredSizeField.getText()), Double.parseDouble(budgetField.getText()));
             buyers.add(buyer);
             users.add(buyer);
             saveBuyers(FXCollections.observableArrayList(buyers));
@@ -1117,17 +1735,11 @@ public class HelloApplication extends Application{
                 locationColumn, gpsCoordinatesColumn, statusColumn, pricePerUnitColumn,
                 totalPriceColumn, developmentStatusColumn
         );
+        ObservableList<Plot> plotData = loadPlots();
+        FilteredList<Plot> filteredPlots = new FilteredList<>(plotData, plot -> "Available".equals(plot.getStatus()));
 
-        // Add sample data
-        ObservableList<Plot> plotData = FXCollections.observableArrayList(
-                new Plot(1, "P001", 50.0, 30.0, "Sector A", "27.2046,77.4977", "Available", 2000.0,  "Developed"),
-                new Plot(2, "P002", 60.0, 40.0, "Sector B", "28.7041,77.1025", "Available", 2200.0,  "Under Development")
-        );
-        for(Plot plot: plotData){
-            if(!(plot.getStatus().equals("Available")))
-                plotData.remove(plot);
-        }
-        plotTable.setItems(plotData);
+        // Set the filtered list to the TableView
+        plotTable.setItems(filteredPlots);
         exit.setOnAction(e->{
             buyerDashboard(stage);
         });
@@ -1480,5 +2092,151 @@ public class HelloApplication extends Application{
         BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,BackgroundPosition.CENTER,new BackgroundSize(100, 100, true, true, true, false));
         return new Background(backgroundImage);
     }
+    public String generateReports() {
+        List<Plot> plots = loadPlots();
+        List<Payment> payments = loadPayments();
+
+        int totalPlots = plots.size();
+        int soldPlots = 0;
+        int availablePlots = 0;
+        double totalRevenue = 0;
+        List<Double> soldPlotAreas = new ArrayList<>();
+
+        for (Plot plot : plots) {
+            if ("Sold".equalsIgnoreCase(plot.getStatus())) {
+                soldPlots++;
+                soldPlotAreas.add(plot.getTotalArea());
+            } else if ("Available".equalsIgnoreCase(plot.getStatus())) {
+                availablePlots++;
+            }
+        }
+
+        for (Payment payment : payments) {
+            totalRevenue += payment.getAmountPaid();
+        }
+
+        double popularArea = mostFrequentArea(soldPlotAreas);
+
+        return String.format(
+                "--- Report ---\n" +
+                        "Total Plots: %d\n" +
+                        "Sold Plots: %d (%.2f%%)\n" +
+                        "Available Plots: %d (%.2f%%)\n" +
+                        "Popular Plot Area: %.2f sq. meters\n" +
+                        "Total Revenue: $%.2f\n",
+                totalPlots, soldPlots, (soldPlots * 100.0) / totalPlots,
+                availablePlots, (availablePlots * 100.0) / totalPlots,
+                popularArea, totalRevenue
+        );
+    }
+
+    public String analyzePlotStatistics() {
+        List<Plot> plots = loadPlots();
+        int totalPlots = plots.size();
+        int soldPlots = 0;
+        int availablePlots = 0;
+        List<Double> soldPlotAreas = new ArrayList<>();
+
+        for (Plot plot : plots) {
+            if ("Sold".equalsIgnoreCase(plot.getStatus())) {
+                soldPlots++;
+                soldPlotAreas.add(plot.getTotalArea());
+            } else if ("Available".equalsIgnoreCase(plot.getStatus())) {
+                availablePlots++;
+            }
+        }
+
+        double popularArea = mostFrequentArea(soldPlotAreas);
+
+        return String.format(
+                "--- Plot Statistics ---\n" +
+                        "Total Plots: %d\n" +
+                        "Sold Plots: %d (%.2f%%)\n" +
+                        "Available Plots: %d (%.2f%%)\n" +
+                        "Popular Plot Area: %.2f sq. meters",
+                totalPlots, soldPlots, (soldPlots * 100.0) / totalPlots,
+                availablePlots, (availablePlots * 100.0) / totalPlots,
+                popularArea
+        );
+    }
+
+    private double mostFrequentArea(List<Double> areas) {
+        double mostFrequent = 0.0;
+        int maxFrequency = 0;
+
+        for (int i = 0; i < areas.size(); i++) {
+            int frequency = 0;
+            for (int j = 0; j < areas.size(); j++) {
+                if (areas.get(i).equals(areas.get(j))) {
+                    frequency++;
+                }
+            }
+            if (frequency > maxFrequency) {
+                maxFrequency = frequency;
+                mostFrequent = areas.get(i);
+            }
+        }
+        return mostFrequent;
+    }
+    public void countPlotAttributes() {
+        List<Plot> plots = loadPlots();
+
+        // Variables to hold counts for each type, status, and category
+        int commercialCount = 0;
+        int residentialCount = 0;
+
+        int availableCount = 0;
+        int reservedCount = 0;
+        int soldCount = 0;
+
+        int categoryACount = 0;
+        int categoryBCount = 0;
+        int categoryCCount = 0;
+
+        // Loop through all plots and update counts
+        for (Plot plot : plots) {
+            // Count plot types
+            if ("Commercial".equalsIgnoreCase(plot.getPlotType())) {
+                commercialCount++;
+            } else if ("Residential".equalsIgnoreCase(plot.getPlotType())) {
+                residentialCount++;
+            }
+
+            // Count plot statuses
+            if ("Available".equalsIgnoreCase(plot.getStatus())) {
+                availableCount++;
+            } else if ("Reserved".equalsIgnoreCase(plot.getStatus())) {
+                reservedCount++;
+            } else if ("Sold".equalsIgnoreCase(plot.getStatus())) {
+                soldCount++;
+            }
+
+            // Count plot categories
+            if ("Corner".equalsIgnoreCase(plot.getPlotCategory())) {
+                categoryACount++;
+            } else if ("Facing Park".equalsIgnoreCase(plot.getPlotCategory())) {
+                categoryBCount++;
+            } else if ("Main Boulevard".equalsIgnoreCase(plot.getPlotCategory())) {
+                categoryCCount++;
+            }
+        }
+
+        // Print results
+        System.out.println("--- Plot Type Counts ---");
+        System.out.println("Commercial: " + commercialCount);
+        System.out.println("Residential: " + residentialCount);
+
+        System.out.println("--- Plot Status Counts ---");
+        System.out.println("Available: " + availableCount);
+        System.out.println("Reserved: " + reservedCount);
+        System.out.println("Sold: " + soldCount);
+
+        System.out.println("--- Plot Category Counts ---");
+        System.out.println("Category A: " + categoryACount);
+        System.out.println("Category B: " + categoryBCount);
+        System.out.println("Category C: " + categoryCCount);
+    }
+
+
 
 }

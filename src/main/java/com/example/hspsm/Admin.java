@@ -14,7 +14,7 @@ public class Admin extends User{
     private static int adminCount = 1;
 
     public Admin(String email, String phoneNumber) {
-        super("Admin", "admin", "Admin", email, phoneNumber);
+        super("Admin", "admin", email, phoneNumber);
         this.adminId = String.format("admin%04d",adminCount++);
     }
 
@@ -39,75 +39,75 @@ public class Admin extends User{
         System.out.println("Plot removed successfully");
     }
 
-    public static String generateReports(){
-        List<Plot> plots = loadPlots();
-        List<Payment> payments = loadPayments();
-
-        int totalPlots = plots.size();
-        int soldPlots = 0;
-        int availablePlots = 0;
-        double totalRevenue = 0;
-        double popularArea = 0;
-        int maxCount = 0;
-        List<Double> soldPlotAreas = new ArrayList<>();
-
-        for (Plot plot : plots) {
-            if ("Sold".equalsIgnoreCase(plot.getStatus())) {
-                soldPlots++;
-                soldPlotAreas.add(plot.getTotalArea());
-            } else if ("Available".equalsIgnoreCase(plot.getStatus())) {
-                availablePlots++;
-            }
-        }
-
-        for (Payment payment : payments) {
-            totalRevenue += payment.getAmountPaid();
-        }
-
-        for (double area : soldPlotAreas) {
-            int count = Collections.frequency(soldPlotAreas, area);
-            if (count > maxCount) {
-                maxCount = count;
-                popularArea = area;
-            }
-        }
-
-        return String.format(
-                "--- Report ---\n" +
-                        "Total Plots: %d\n" +
-                        "Sold Plots: %d\n" +
-                        "Available Plots: %d\n" +
-                        "Popular Plot Area: %.2f sq. meters\n" +
-                        "Total Revenue: $%.2f\n",
-                totalPlots, soldPlots, availablePlots, popularArea, totalRevenue
-        );
-    }
-    public static String analyzePlotStatistics() {
-        List<Plot> plots = loadPlots();
-        int totalPlots = plots.size();
-        int soldPlots = 0;
-        int availablePlots = 0;
-        List<Double> plotAreasSold = new ArrayList<>();
-        for (Plot plot : plots) {
-            if ("Sold".equals(plot.getStatus())) {
-                soldPlots++;
-                plotAreasSold.add(plot.getTotalArea());
-            } else if ("Available".equals(plot.getStatus())) {
-                availablePlots++;
-            }
-        }
-        double popularArea = 0;
-        int maxCount = 0;
-        for (double area : plotAreasSold) {
-            int count = Collections.frequency(plotAreasSold, area);
-            if (count > maxCount) {
-                maxCount = count;
-                popularArea = area;
-            }
-        }
-        return String.format("Plot Statistics:\nTotal Plots: %d\nSold Plots: %d\nAvailable Plots: %d\nPopular Plot Area: %.2f",
-                totalPlots, soldPlots, availablePlots, popularArea);
-    }
+//    public String generateReports(){
+//        List<Plot> plots = loadPlots();
+//        List<Payment> payments = loadPayments();
+//
+//        int totalPlots = plots.size();
+//        int soldPlots = 0;
+//        int availablePlots = 0;
+//        double totalRevenue = 0;
+//        double popularArea = 0;
+//        int maxCount = 0;
+//        List<Double> soldPlotAreas = new ArrayList<>();
+//
+//        for (Plot plot : plots) {
+//            if ("Sold".equalsIgnoreCase(plot.getStatus())) {
+//                soldPlots++;
+//                soldPlotAreas.add(plot.getTotalArea());
+//            } else if ("Available".equalsIgnoreCase(plot.getStatus())) {
+//                availablePlots++;
+//            }
+//        }
+//
+//        for (Payment payment : payments) {
+//            totalRevenue += payment.getAmountPaid();
+//        }
+//
+//        for (double area : soldPlotAreas) {
+//            int count = Collections.frequency(soldPlotAreas, area);
+//            if (count > maxCount) {
+//                maxCount = count;
+//                popularArea = area;
+//            }
+//        }
+//
+//        return String.format(
+//                "--- Report ---\n" +
+//                        "Total Plots: %d\n" +
+//                        "Sold Plots: %d\n" +
+//                        "Available Plots: %d\n" +
+//                        "Popular Plot Area: %.2f sq. meters\n" +
+//                        "Total Revenue: $%.2f\n",
+//                totalPlots, soldPlots, availablePlots, popularArea, totalRevenue
+//        );
+//    }
+//    public String analyzePlotStatistics() {
+//        List<Plot> plots = loadPlots();
+//        int totalPlots = plots.size();
+//        int soldPlots = 0;
+//        int availablePlots = 0;
+//        List<Double> plotAreasSold = new ArrayList<>();
+//        for (Plot plot : plots) {
+//            if ("Sold".equals(plot.getStatus())) {
+//                soldPlots++;
+//                plotAreasSold.add(plot.getTotalArea());
+//            } else if ("Available".equals(plot.getStatus())) {
+//                availablePlots++;
+//            }
+//        }
+//        double popularArea = 0;
+//        int maxCount = 0;
+//        for (double area : plotAreasSold) {
+//            int count = Collections.frequency(plotAreasSold, area);
+//            if (count > maxCount) {
+//                maxCount = count;
+//                popularArea = area;
+//            }
+//        }
+//        return String.format("Plot Statistics:\nTotal Plots: %d\nSold Plots: %d\nAvailable Plots: %d\nPopular Plot Area: %.2f",
+//                totalPlots, soldPlots, availablePlots, popularArea);
+//    }
     public static void updatePlotDetails(Plot plot){
         plot.updatePlotDetails();
     }

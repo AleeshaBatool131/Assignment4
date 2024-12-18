@@ -5,9 +5,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Payment {
+public class Payment implements Serializable{
     public static String PaymentFileName= "Payments.ser";
-    private static int paymentCount = 0;
     private int paymentId;
     private int plotId;
     private int buyerId;
@@ -16,14 +15,14 @@ public class Payment {
     private String paymentMethod;// cash, bank transfer, card
     private double outstandingBalance;
 
-    public Payment(int plotId, int buyerId,  double amountPaid, String paymentMethod) {
-        this.paymentId=++paymentCount;
+    public Payment(int paymentId, int plotId, int buyerId,  double amountPaid, String paymentMethod, double outstandingBalance, LocalDate paymentDate) {
+        this.paymentId=paymentId;
         this.plotId = plotId;
         this.buyerId = buyerId;
-        this.paymentDate = LocalDate.now();
+        this.paymentDate = paymentDate;
         this.amountPaid = amountPaid;
         this.paymentMethod = paymentMethod;
-        this.outstandingBalance = getOutstandingBalance();
+        this.outstandingBalance = outstandingBalance;
     }
 
     public LocalDate getPaymentDate() {

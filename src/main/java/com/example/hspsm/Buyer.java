@@ -16,8 +16,8 @@ public class Buyer extends User implements Serializable {
     private double preferredSize;
     private double budget;
 
-    public Buyer(String username, String password, String role, String email, String phoneNumber, String preferredLocation, double preferredSize, double budget) {
-        super(username, password, role, email, phoneNumber);
+    public Buyer(String username, String password, String email, String phoneNumber, String preferredLocation, double preferredSize, double budget) {
+        super(username, password, email, phoneNumber);
         this.buyerId = ++buyerIdCounter;
         this.preferredLocation = preferredLocation;
         this.preferredSize = preferredSize;

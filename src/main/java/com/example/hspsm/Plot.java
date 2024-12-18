@@ -11,41 +11,25 @@ public class Plot implements Serializable{
     private double length;
     private double width;
     private double totalArea;
+    private String plotType; // Commercial or Residential
     private String location;
-    private String gpsCoordinates;
     private String status;// Available, Reserved, Sold
-    private double pricePerUnit;
+    private double pricePerMarla;
     private double totalPrice;
-    private String developmentStatus; //Developed, Undeveloped
+    private String plotCategory; // Corner, Park-facing
 
-    public Plot(int plotId, String plotNumber, double length, double width, String location, String gpsCoordinates, String status, double pricePerUnit, String developmentStatus) {
+    public Plot(int plotId, String plotNumber, double length, double width, double totalArea, String location, String plotType, String plotCategory, double pricePerMarla, double totalPrice, String status) {
         this.plotId = plotId;
         this.plotNumber = plotNumber;
         this.length = length;
         this.width = width;
-        this.totalArea = calculateArea();
+        this.totalArea = totalArea;
         this.location = location;
-        this.gpsCoordinates = gpsCoordinates;
+        this.plotType = plotType;
+        this.plotCategory = plotCategory;
+        this.pricePerMarla = pricePerMarla;
+        this.totalPrice = totalPrice;
         this.status = status;
-        this.pricePerUnit = pricePerUnit;
-        this.totalPrice = calculateTotalPrice();
-        this.developmentStatus = developmentStatus;
-    }
-
-    public String getDevelopmentStatus() {
-        return developmentStatus;
-    }
-
-    public void setDevelopmentStatus(String developmentStatus) {
-        this.developmentStatus = developmentStatus;
-    }
-
-    public String getGpsCoordinates() {
-        return gpsCoordinates;
-    }
-
-    public void setGpsCoordinates(String gpsCoordinates) {
-        this.gpsCoordinates = gpsCoordinates;
     }
 
     public double getLength() {
@@ -80,12 +64,12 @@ public class Plot implements Serializable{
         this.plotNumber = plotNumber;
     }
 
-    public double getPricePerUnit() {
-        return pricePerUnit;
+    public double getPricePerMarla() {
+        return pricePerMarla;
     }
 
-    public void setPricePerUnit(double pricePerUnit) {
-        this.pricePerUnit = pricePerUnit;
+    public void setPricePerMarla(double pricePerMarla) {
+        this.pricePerMarla = pricePerMarla;
     }
 
     public String getStatus() {
@@ -120,6 +104,22 @@ public class Plot implements Serializable{
         this.width = width;
     }
 
+    public String getPlotCategory() {
+        return plotCategory;
+    }
+
+    public void setPlotCategory(String plotCategory) {
+        this.plotCategory = plotCategory;
+    }
+
+    public String getPlotType() {
+        return plotType;
+    }
+
+    public void setPlotType(String plotType) {
+        this.plotType = plotType;
+    }
+
     public double calculateArea(){
         return length*width;
 
@@ -133,9 +133,7 @@ public class Plot implements Serializable{
                     plot.setPlotNumber(this.plotNumber);
                     plot.setLength(this.length);
                     plot.setWidth(this.width);
-                    plot.setPricePerUnit(this.pricePerUnit);
-                    plot.setDevelopmentStatus(this.developmentStatus);
-                    plot.setGpsCoordinates(this.gpsCoordinates);
+                    plot.setPricePerMarla(this.pricePerMarla);
                     break;
                 }
             }
@@ -168,10 +166,8 @@ public class Plot implements Serializable{
                         System.out.println("Width: "+plot.getWidth());
                         System.out.println("Total Area: "+plot.getTotalArea());
                         System.out.println("Location: "+plot.getLocation());
-                        System.out.println("GPS Coordinates: "+plot.getGpsCoordinates());
-                        System.out.println("Price Per Unit: "+ plot.getPricePerUnit());
+                        System.out.println("Price Per Unit: "+ plot.getPricePerMarla());
                         System.out.println("Total Price: "+plot.getTotalPrice());
-                        System.out.println("Development Status: "+plot.getDevelopmentStatus());
                         System.out.println("Status: "+plot.getStatus());
                         return;
                     }
@@ -202,11 +198,11 @@ public class Plot implements Serializable{
     }
 
     public  double calculateTotalPrice(){
-        return pricePerUnit*totalArea;
+        return pricePerMarla *totalArea;
     }
     @Override
     public String toString() {
-        return String.format("Plot Number: %s\nLength: %f\nWidth: %f\nTotal Area: %f\nLocation: %s\nGPS Coordinates: %s\nPrice Per Unit: %f\nTotal Price: %f\nDevelopment Status: %s\nStatus: %s", plotNumber, length, width, totalArea, location, gpsCoordinates, pricePerUnit, totalPrice, developmentStatus, status);
+        return String.format("Plot Number: %s\nLength: %f\nWidth: %f\nTotal Area: %f\nLocation: %s\nGPS Coordinates: %s\nPrice Per Unit: %f\nTotal Price: %f\nDevelopment Status: %s\nStatus: %s", plotNumber, length, width, totalArea, location, pricePerMarla, totalPrice, status);
 
     }
 }

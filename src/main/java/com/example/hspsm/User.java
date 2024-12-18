@@ -12,16 +12,14 @@ public class User implements Serializable {
     private String userId;
     private String username;
     private String password;
-    private String role;//(admin, buyer, sales, visitor)
     private String email;
     private String phoneNumber;
     private LocalDate registrationDate;
 
-    public User(String username, String password, String role, String email, String phoneNumber) {
+    public User(String username, String password, String email, String phoneNumber) {
         this.userId= String.format("%05d",userCount++);
         this.username = username;
         this.password = password;
-        this.role = role;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.registrationDate = LocalDate.now();
@@ -63,14 +61,6 @@ public class User implements Serializable {
         this.registrationDate = registrationDate;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     public String getUserId() {
         return userId;
     }
@@ -106,9 +96,7 @@ public class User implements Serializable {
                 return;
             }
         }
-        User user = new User(username,password,role,email,phoneNumber);
-        users.add(user);
-        saveUsers(users);
+
     }
 
     public boolean loginUser(){
@@ -130,8 +118,6 @@ public class User implements Serializable {
         String username = scanner.nextLine();
         System.out.print("Enter Password: ");
         String password = scanner.nextLine();
-        System.out.print("Enter Role (Admin/Buyer): ");
-        String role = scanner.nextLine();
         System.out.print("Enter Email: ");
         String email = scanner.nextLine();
         System.out.print("Enter Phone Number: ");
@@ -142,7 +128,6 @@ public class User implements Serializable {
                     user.setPhoneNumber(phoneNumber);
                     user.setPassword(password);
                     user.setUsername(username);
-                    user.setRole(role);
                     break;
                 }
             }
@@ -158,7 +143,6 @@ public class User implements Serializable {
                     System.out.println("UserName: "+user.getUsername());
                     System.out.println("Email: "+user.getEmail());
                     System.out.println("Phone Number: "+user.getPhoneNumber());
-                    System.out.println("Role: "+user.getRole());
                     System.out.println("Registration Date: "+user.getRegistrationDate());
                     found = true;
                     break;
