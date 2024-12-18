@@ -138,18 +138,33 @@ public class HelloApplication extends Application{
         invalidMessage.setTextAlignment(TextAlignment.CENTER);
         invalidMessage.setFill(Color.RED);
         invalidMessage.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-
         List<User> users = loadUsers();
         login.setOnAction(e -> {
-            boolean isValidUser = users.stream().anyMatch(user ->
-                    user.getUsername().equals(usernameField.getText()) &&
-                            user.getPassword().equals(passwordField.getText()));
+            boolean isValidUser = false;
+            int buyerId = -1;
+            for(User user: users){
+                if(user.getUsername().equals(usernameField.getText()) &&
+                        user.getPassword().equals(passwordField.getText())){
+                    isValidUser = true;
+                    List<Buyer> buyers = loadBuyers();
+                    for(Buyer buyer: buyers){
+                        if(buyer.getUsername().equals(usernameField.getText()) &&
+                                buyer.getPassword().equals(passwordField.getText())){
+                            buyerId=buyer.getBuyerId();
+                            break;
+                        }
+                    }
 
+                    break;
+                }
+
+            }
             if (isValidUser) {
-                buyerDashboard(stage);
+                buyerDashboard(stage, buyerId);
             } else {
                 invalidMessage.setText("Invalid Username or Password");
             }
+
         });
 
         admin.setOnAction(e -> adminLoginScreen(stage));
@@ -1338,7 +1353,7 @@ public class HelloApplication extends Application{
             alert.show();
         }
     }
-    public void buyerDashboard(Stage stage) {
+    public void buyerDashboard(Stage stage, int buyerId) {
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(15);
@@ -1440,11 +1455,11 @@ public class HelloApplication extends Application{
         logout.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14;");
         logout.setPrefSize(150, 80);
 //         Set button actions
-        viewPlots.setOnAction(e -> viewPlots(stage));
-        requestPlot.setOnAction(e -> requestPlot(stage));
-        ownershipDetails.setOnAction(e -> ownershipDetails(stage));
-        trackPaymentStatus.setOnAction(e -> trackPaymentStatus(stage));
-        updatePreference.setOnAction(e -> updatePreference(stage));
+        viewPlots.setOnAction(e -> viewPlots(stage, buyerId));
+        requestPlot.setOnAction(e -> requestPlot(stage, buyerId));
+        ownershipDetails.setOnAction(e -> ownershipDetails(stage, buyerId));
+        trackPaymentStatus.setOnAction(e -> trackPaymentStatus(stage, buyerId));
+        updatePreference.setOnAction(e -> updatePreference(stage, buyerId));
 
         viewMap.setOnAction(e -> {
             stage.setScene(ViewMap.getMainScene(stage));
@@ -1675,7 +1690,9 @@ public class HelloApplication extends Application{
             users.add(buyer);
             saveBuyers(FXCollections.observableArrayList(buyers));
             saveUsers(FXCollections.observableArrayList(users));
-            buyerDashboard(stage);
+            int buyerId = buyer.getBuyerId();
+
+            buyerDashboard(stage, buyerId);
         });
 
         cancel.setOnAction(e->{
@@ -1689,66 +1706,63 @@ public class HelloApplication extends Application{
         stage.setTitle("Register User");
     }
 
-    private void viewPlots(Stage stage){
+    private void viewPlots(Stage stage, int buyerId){
         VBox vBox = new VBox();
+        vBox.setBackground(background());
         Button exit = new Button("Exit");
-        TableView plotTable = new TableView<>();
-        ObservableList<Plot> plots = loadPlots();
+        TableView<Plot> plotTable = new TableView<>();
+        plotTable.setItems(loadPlots());
 
-        // Define columns
-        TableColumn<Plot, Integer> plotIdColumn = new TableColumn<>("Plot ID");
-        plotIdColumn.setCellValueFactory(new PropertyValueFactory<>("plotId"));
+        TableColumn<Plot, Integer> idColumn = new TableColumn<>("Plot ID");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("plotId"));
 
-        TableColumn<Plot, String> plotNumberColumn = new TableColumn<>("Plot Number");
-        plotNumberColumn.setCellValueFactory(new PropertyValueFactory<>("plotNumber"));
+        TableColumn<Plot, String> numberColumn = new TableColumn<>("Plot Number");
+        numberColumn.setCellValueFactory(new PropertyValueFactory<>("plotNumber"));
 
-        TableColumn<Plot, Double> lengthColumn = new TableColumn<>("Length");
+        TableColumn<Plot, Double> lengthColumn = new TableColumn<>("Length (ft)");
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("length"));
 
-        TableColumn<Plot, Double> widthColumn = new TableColumn<>("Width");
+        TableColumn<Plot, Double> widthColumn = new TableColumn<>("Width (ft)");
         widthColumn.setCellValueFactory(new PropertyValueFactory<>("width"));
 
-        TableColumn<Plot, Double> totalAreaColumn = new TableColumn<>("Total Area");
-        totalAreaColumn.setCellValueFactory(new PropertyValueFactory<>("totalArea"));
+        TableColumn<Plot, Double> areaColumn = new TableColumn<>("Total Area (Marla)");
+        areaColumn.setCellValueFactory(new PropertyValueFactory<>("totalArea"));
 
         TableColumn<Plot, String> locationColumn = new TableColumn<>("Location");
         locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
 
-        TableColumn<Plot, String> gpsCoordinatesColumn = new TableColumn<>("GPS Coordinates");
-        gpsCoordinatesColumn.setCellValueFactory(new PropertyValueFactory<>("gpsCoordinates"));
+        TableColumn<Plot, String> typeColumn = new TableColumn<>("Plot Type");
+        typeColumn.setCellValueFactory(new PropertyValueFactory<>("plotType"));
+
+        TableColumn<Plot, String> categoryColumn = new TableColumn<>("Plot Category");
+        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("plotCategory"));
 
         TableColumn<Plot, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        TableColumn<Plot, Double> pricePerUnitColumn = new TableColumn<>("Price per Unit");
-        pricePerUnitColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerUnit"));
+        TableColumn<Plot, Double> marlaColumn = new TableColumn<>("Price Per Marla");
+        marlaColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerMarla"));
 
-        TableColumn<Plot, Double> totalPriceColumn = new TableColumn<>("Total Price");
-        totalPriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
+        TableColumn<Plot, Double> priceColumn = new TableColumn<>("Total Price");
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
 
-        TableColumn<Plot, String> developmentStatusColumn = new TableColumn<>("Development Status");
-        developmentStatusColumn.setCellValueFactory(new PropertyValueFactory<>("developmentStatus"));
+        plotTable.getColumns().addAll(idColumn, numberColumn, lengthColumn, widthColumn, areaColumn, locationColumn, typeColumn, categoryColumn, marlaColumn,  priceColumn, statusColumn);
 
-        // Add columns to TableView
-        plotTable.getColumns().addAll(
-                plotIdColumn, plotNumberColumn, lengthColumn, widthColumn, totalAreaColumn,
-                locationColumn, gpsCoordinatesColumn, statusColumn, pricePerUnitColumn,
-                totalPriceColumn, developmentStatusColumn
-        );
+
         ObservableList<Plot> plotData = loadPlots();
         FilteredList<Plot> filteredPlots = new FilteredList<>(plotData, plot -> "Available".equals(plot.getStatus()));
 
         // Set the filtered list to the TableView
         plotTable.setItems(filteredPlots);
         exit.setOnAction(e->{
-            buyerDashboard(stage);
+            buyerDashboard(stage, buyerId);
         });
         vBox.getChildren().addAll(plotTable,exit);
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
-        stage.setTitle("Login Screen");
+        stage.setTitle("View Plots");
     }
-    public void requestPlot(Stage stage) {
+    public void requestPlot(Stage stage, int buyerId) {
         VBox vBox = new VBox();
         Label label = new Label("Request a Plot");
         TextField plotIdField = new TextField();
@@ -1771,7 +1785,7 @@ public class HelloApplication extends Application{
         });
 
         backButton.setOnAction(e -> {
-            buyerDashboard(stage);
+            buyerDashboard(stage, buyerId);
         });
 
         vBox.getChildren().addAll(label, plotIdField, submitButton, backButton);
@@ -1779,8 +1793,7 @@ public class HelloApplication extends Application{
         stage.setScene(scene);
         stage.setTitle("Request Plot");
     }
-
-    public void ownershipDetails(Stage stage) {
+    public void ownershipDetails(Stage stage, int loggedInBuyerId) {
         VBox vBox = new VBox();
         Label label = new Label("Ownership Details");
         TableView<Document> tableView = new TableView<>();
@@ -1809,7 +1822,8 @@ public class HelloApplication extends Application{
         ObservableList<Document> ownershipDocs = FXCollections.observableArrayList();
 
         for (Document doc : documents) {
-            if ("Ownership".equalsIgnoreCase(doc.getDocumentType())) {
+            // Filter by document type "Ownership" and buyerId matches the logged-in buyer
+            if ("Ownership".equalsIgnoreCase(doc.getDocumentType()) && doc.getBuyerId() == loggedInBuyerId) {
                 ownershipDocs.add(doc);
             }
         }
@@ -1818,7 +1832,7 @@ public class HelloApplication extends Application{
 
         // Back button to return to buyerDashboard
         Button backButton = new Button("Back");
-        backButton.setOnAction(e -> buyerDashboard(stage));
+        backButton.setOnAction(e -> buyerDashboard(stage, loggedInBuyerId));
 
         vBox.getChildren().addAll(label, tableView, backButton);
         Scene scene = new Scene(vBox, 1300, 800);
@@ -1826,7 +1840,54 @@ public class HelloApplication extends Application{
         stage.setTitle("Ownership Details");
     }
 
-    public void trackPaymentStatus(Stage stage) {
+
+//    public void ownershipDetails(Stage stage) {
+//        VBox vBox = new VBox();
+//        Label label = new Label("Ownership Details");
+//        TableView<Document> tableView = new TableView<>();
+//
+//        // Define columns for the TableView
+//        TableColumn<Document, Integer> documentIdColumn = new TableColumn<>("Document ID");
+//        documentIdColumn.setCellValueFactory(new PropertyValueFactory<>("documentId"));
+//
+//        TableColumn<Document, Integer> buyerIdColumn = new TableColumn<>("Buyer ID");
+//        buyerIdColumn.setCellValueFactory(new PropertyValueFactory<>("buyerId"));
+//
+//        TableColumn<Document, Integer> plotIdColumn = new TableColumn<>("Plot ID");
+//        plotIdColumn.setCellValueFactory(new PropertyValueFactory<>("plotId"));
+//
+//        TableColumn<Document, String> documentTypeColumn = new TableColumn<>("Document Type");
+//        documentTypeColumn.setCellValueFactory(new PropertyValueFactory<>("documentType"));
+//
+//        TableColumn<Document, LocalDate> uploadDateColumn = new TableColumn<>("Upload Date");
+//        uploadDateColumn.setCellValueFactory(new PropertyValueFactory<>("uploadDate"));
+//
+//        // Add columns to the TableView
+//        tableView.getColumns().addAll(documentIdColumn, buyerIdColumn, plotIdColumn, documentTypeColumn, uploadDateColumn);
+//
+//        // Load ownership documents and set them in the TableView
+//        List<Document> documents = loadDocuments();
+//        ObservableList<Document> ownershipDocs = FXCollections.observableArrayList();
+//
+//        for (Document doc : documents) {
+//            if ("Ownership".equalsIgnoreCase(doc.getDocumentType())) {
+//                ownershipDocs.add(doc);
+//            }
+//        }
+//
+//        tableView.setItems(ownershipDocs);
+//
+//        // Back button to return to buyerDashboard
+//        Button backButton = new Button("Back");
+//        backButton.setOnAction(e -> buyerDashboard(stage));
+//
+//        vBox.getChildren().addAll(label, tableView, backButton);
+//        Scene scene = new Scene(vBox, 1300, 800);
+//        stage.setScene(scene);
+//        stage.setTitle("Ownership Details");
+//    }
+
+    public void trackPaymentStatus(Stage stage, int buyerId) {
         VBox vBox = new VBox();
         Label label = new Label("Track Payment Status");
 
@@ -1897,7 +1958,7 @@ public class HelloApplication extends Application{
 
         // Back button to return to buyerDashboard
         Button backButton = new Button("Back");
-        backButton.setOnAction(e -> buyerDashboard(stage));
+        backButton.setOnAction(e -> buyerDashboard(stage, buyerId));
 
         vBox.getChildren().addAll(label, plotIdField, searchButton, tableView, backButton);
         Scene scene = new Scene(vBox, 1300, 800);
@@ -1913,7 +1974,7 @@ public class HelloApplication extends Application{
         alert.showAndWait();
     }
 
-    public void updatePreference(Stage stage) {
+    public void updatePreference(Stage stage,int buyerId) {
         VBox vBox = new VBox();
         Label label = new Label("Update Preferences");
 
@@ -1959,11 +2020,11 @@ public class HelloApplication extends Application{
             alert.showAndWait();
 
             // After updating, go back to the buyer dashboard
-            buyerDashboard(stage);
+            buyerDashboard(stage, buyerId);
         });
 
         backButton.setOnAction(e -> {
-            buyerDashboard(stage);
+            buyerDashboard(stage, buyerId);
         });
 
         vBox.getChildren().addAll(label, preferredLocationField, preferredSizeField, budgetField, updateButton, backButton);
