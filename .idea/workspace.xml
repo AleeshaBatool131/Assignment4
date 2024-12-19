@@ -7,10 +7,7 @@
     <list default="true" id="8a0e09cd-0fcb-4887-8083-ebccd80d2963" name="Changes" comment="">
       <change afterPath="$PROJECT_DIR$/../Week4/ToString_Equals/src/Week_7/VehicleTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/hspsm/Analytics.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/hspsm/HelloApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/hspsm/HelloApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/hspsm/Map.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/hspsm/Notification.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plots.ser" beforeDir="false" afterPath="$PROJECT_DIR$/Plots.ser" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
