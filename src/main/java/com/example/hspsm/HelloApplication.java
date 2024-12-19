@@ -2062,7 +2062,18 @@ public void generateReportScene(Stage stage) {
         vBox.setBackground(background());
         Button exit = new Button("Exit");
         TableView<Plot> plotTable = new TableView<>();
-        plotTable.setItems(loadPlots());
+        ObservableList<Plot> plotData= loadPlots();
+
+        if (plotData == null || plotData.isEmpty()) {
+            Label noPlotsLabel = new Label("No available plots");
+            noPlotsLabel.setFont(new Font("Times New Roman", 18));
+            vBox.getChildren().addAll(noPlotsLabel, exit);
+            Scene scene = new Scene(vBox, 1300, 800);
+            stage.setScene(scene);
+            stage.setTitle("View Plots");
+            return;
+        }
+
 
         TableColumn<Plot, Integer> idColumn = new TableColumn<>("Plot ID");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("plotId"));
@@ -2100,7 +2111,6 @@ public void generateReportScene(Stage stage) {
         plotTable.getColumns().addAll(idColumn, numberColumn, lengthColumn, widthColumn, areaColumn, locationColumn, typeColumn, categoryColumn, marlaColumn,  priceColumn, statusColumn);
 
 
-        ObservableList<Plot> plotData = loadPlots();
         FilteredList<Plot> filteredPlots = new FilteredList<>(plotData, plot -> "Available".equals(plot.getStatus()));
 
         // Set the filtered list to the TableView
@@ -2122,17 +2132,43 @@ public void generateReportScene(Stage stage) {
         Button backButton = new Button("Back");
 
         submitButton.setOnAction(e -> {
-            // Placeholder for request plot logic
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Plot request submitted!");
-            alert.showAndWait();
+            String plotIdText = plotIdField.getText();
+
+            // Validate the plot ID input
+            if (plotIdText.isEmpty()) {
+                showAlertMessage(Alert.AlertType.ERROR, "Error", "Plot ID cannot be empty.");
+                return;
+            }
+
+            int plotId;
+            try {
+                plotId = Integer.parseInt(plotIdText);
+            } catch (NumberFormatException ex) {
+                showAlertMessage(Alert.AlertType.ERROR, "Error", "Invalid Plot ID. Please enter a valid number.");
+                return;
+            }
+
+            // Load plots and check if the entered Plot ID exists
             ObservableList<Plot> plots = loadPlots();
+            boolean plotFound = false;
             for (Plot plot : plots) {
-                if (plot.getPlotId()==Integer.parseInt(plotIdField.getText())) {
+                if (plot.getPlotId() == plotId) {
+                    if ("Reserved".equals(plot.getStatus())) {
+                        showAlertMessage(Alert.AlertType.WARNING, "Plot Reserved", "This plot is already reserved.");
+                        return;
+                    }
+                    // Reserve the plot
                     plot.setStatus("Reserved");
+                    savePlots(plots);
+                    showAlertMessage(Alert.AlertType.INFORMATION, "Success", "Plot request submitted successfully!");
+                    plotFound = true;
                     break;
                 }
             }
-            savePlots(plots);
+
+            if (!plotFound) {
+                showAlertMessage(Alert.AlertType.ERROR, "Error", "Plot ID not found.");
+            }
         });
 
         backButton.setOnAction(e -> {
@@ -2143,6 +2179,12 @@ public void generateReportScene(Stage stage) {
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Request Plot");
+    }
+    private void showAlertMessage(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
     public void ownershipDetails(Stage stage, int loggedInBuyerId) {
         VBox vBox = new VBox();
@@ -2167,18 +2209,22 @@ public void generateReportScene(Stage stage) {
 
         // Add columns to the TableView
         tableView.getColumns().addAll(documentIdColumn, buyerIdColumn, plotIdColumn, documentTypeColumn, uploadDateColumn);
-
         // Load ownership documents and set them in the TableView
         List<Document> documents = loadDocuments();
         ObservableList<Document> ownershipDocs = FXCollections.observableArrayList();
 
+        // Filter documents based on the logged-in buyer and document type
         for (Document doc : documents) {
-            // Filter by document type "Ownership" and buyerId matches the logged-in buyer
             if ("Ownership".equalsIgnoreCase(doc.getDocumentType()) && doc.getBuyerId() == loggedInBuyerId) {
                 ownershipDocs.add(doc);
             }
         }
+        // If no documents found, show an alert
+        if (ownershipDocs.isEmpty()) {
+            showAlertMessage(Alert.AlertType.INFORMATION, "No Documents", "No ownership documents found for this buyer.");
+        }
 
+        // Set the filtered ownership documents to the TableView
         tableView.setItems(ownershipDocs);
 
         // Back button to return to buyerDashboard
@@ -2190,53 +2236,6 @@ public void generateReportScene(Stage stage) {
         stage.setScene(scene);
         stage.setTitle("Ownership Details");
     }
-
-
-//    public void ownershipDetails(Stage stage) {
-//        VBox vBox = new VBox();
-//        Label label = new Label("Ownership Details");
-//        TableView<Document> tableView = new TableView<>();
-//
-//        // Define columns for the TableView
-//        TableColumn<Document, Integer> documentIdColumn = new TableColumn<>("Document ID");
-//        documentIdColumn.setCellValueFactory(new PropertyValueFactory<>("documentId"));
-//
-//        TableColumn<Document, Integer> buyerIdColumn = new TableColumn<>("Buyer ID");
-//        buyerIdColumn.setCellValueFactory(new PropertyValueFactory<>("buyerId"));
-//
-//        TableColumn<Document, Integer> plotIdColumn = new TableColumn<>("Plot ID");
-//        plotIdColumn.setCellValueFactory(new PropertyValueFactory<>("plotId"));
-//
-//        TableColumn<Document, String> documentTypeColumn = new TableColumn<>("Document Type");
-//        documentTypeColumn.setCellValueFactory(new PropertyValueFactory<>("documentType"));
-//
-//        TableColumn<Document, LocalDate> uploadDateColumn = new TableColumn<>("Upload Date");
-//        uploadDateColumn.setCellValueFactory(new PropertyValueFactory<>("uploadDate"));
-//
-//        // Add columns to the TableView
-//        tableView.getColumns().addAll(documentIdColumn, buyerIdColumn, plotIdColumn, documentTypeColumn, uploadDateColumn);
-//
-//        // Load ownership documents and set them in the TableView
-//        List<Document> documents = loadDocuments();
-//        ObservableList<Document> ownershipDocs = FXCollections.observableArrayList();
-//
-//        for (Document doc : documents) {
-//            if ("Ownership".equalsIgnoreCase(doc.getDocumentType())) {
-//                ownershipDocs.add(doc);
-//            }
-//        }
-//
-//        tableView.setItems(ownershipDocs);
-//
-//        // Back button to return to buyerDashboard
-//        Button backButton = new Button("Back");
-//        backButton.setOnAction(e -> buyerDashboard(stage));
-//
-//        vBox.getChildren().addAll(label, tableView, backButton);
-//        Scene scene = new Scene(vBox, 1300, 800);
-//        stage.setScene(scene);
-//        stage.setTitle("Ownership Details");
-//    }
 
     public void trackPaymentStatus(Stage stage, int buyerId) {
         VBox vBox = new VBox();
@@ -2280,7 +2279,7 @@ public void generateReportScene(Stage stage) {
         searchButton.setOnAction(e -> {
             String plotIdText = plotIdField.getText();
             if (plotIdText.isEmpty()) {
-                showAlert("Error", "Please enter a Plot ID.");
+                showAlertMessage(Alert.AlertType.ERROR,"Error", "Please enter a Plot ID.");
                 return;
             }
 
@@ -2297,13 +2296,13 @@ public void generateReportScene(Stage stage) {
                 }
 
                 if (paymentList.isEmpty()) {
-                    showAlert("No Payments Found", "No payment records found for the given Plot ID.");
+                    showAlertMessage(Alert.AlertType.INFORMATION,"No Payments Found", "No payment records found for the given Plot ID.");
                 } else {
                     ObservableList<Payment> paymentData = FXCollections.observableArrayList(paymentList);
                     tableView.setItems(paymentData);
                 }
             } catch (NumberFormatException ex) {
-                showAlert("Invalid Input", "Please enter a valid Plot ID.");
+                showAlertMessage(Alert.AlertType.ERROR,"Invalid Input", "Please enter a valid Plot ID.");
             }
         });
 
@@ -2315,14 +2314,6 @@ public void generateReportScene(Stage stage) {
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Track Payment Status");
-    }
-
-    private static void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
     public void updatePreference(Stage stage,int buyerId) {
@@ -2350,7 +2341,7 @@ public void generateReportScene(Stage stage) {
 
             // Validate the inputs
             if (preferredLocation.isEmpty() || preferredSizeText.isEmpty() || budgetText.isEmpty()) {
-                showAlert("Error", "Please fill all the fields.");
+                showAlertMessage(Alert.AlertType.ERROR,"Error", "Please fill all the fields.");
                 return;
             }
 
@@ -2361,7 +2352,7 @@ public void generateReportScene(Stage stage) {
                 preferredSize = Double.parseDouble(preferredSizeText);
                 budget = Double.parseDouble(budgetText);
             } catch (NumberFormatException ex) {
-                showAlert("Error", "Please enter valid numbers for size and budget.");
+                showAlertMessage(Alert.AlertType.ERROR,"Error", "Please enter valid numbers for size and budget.");
                 return;
             }
 
@@ -2389,7 +2380,6 @@ public void generateReportScene(Stage stage) {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("Users.ser"))) {
             List<User> userList = (List<User>) inputStream.readObject();
             users.addAll(userList); // Add all items to ObservableList
-            userCount = users.size() + 1; // Assuming `userCount` is declared elsewhere.
         } catch (FileNotFoundException e) {
             System.out.println("Users file not found. Starting with an empty list.");
         } catch (IOException | ClassNotFoundException e) {
@@ -2590,65 +2580,4 @@ public void generateReportScene(Stage stage) {
         }
         return mostFrequent;
     }
-    public void countPlotAttributes() {
-        List<Plot> plots = loadPlots();
-
-        // Variables to hold counts for each type, status, and category
-        int commercialCount = 0;
-        int residentialCount = 0;
-
-        int availableCount = 0;
-        int reservedCount = 0;
-        int soldCount = 0;
-
-        int categoryACount = 0;
-        int categoryBCount = 0;
-        int categoryCCount = 0;
-
-        // Loop through all plots and update counts
-        for (Plot plot : plots) {
-            // Count plot types
-            if ("Commercial".equalsIgnoreCase(plot.getPlotType())) {
-                commercialCount++;
-            } else if ("Residential".equalsIgnoreCase(plot.getPlotType())) {
-                residentialCount++;
-            }
-
-            // Count plot statuses
-            if ("Available".equalsIgnoreCase(plot.getStatus())) {
-                availableCount++;
-            } else if ("Reserved".equalsIgnoreCase(plot.getStatus())) {
-                reservedCount++;
-            } else if ("Sold".equalsIgnoreCase(plot.getStatus())) {
-                soldCount++;
-            }
-
-            // Count plot categories
-            if ("Corner".equalsIgnoreCase(plot.getPlotCategory())) {
-                categoryACount++;
-            } else if ("Facing Park".equalsIgnoreCase(plot.getPlotCategory())) {
-                categoryBCount++;
-            } else if ("Main Boulevard".equalsIgnoreCase(plot.getPlotCategory())) {
-                categoryCCount++;
-            }
-        }
-
-        // Print results
-        System.out.println("--- Plot Type Counts ---");
-        System.out.println("Commercial: " + commercialCount);
-        System.out.println("Residential: " + residentialCount);
-
-        System.out.println("--- Plot Status Counts ---");
-        System.out.println("Available: " + availableCount);
-        System.out.println("Reserved: " + reservedCount);
-        System.out.println("Sold: " + soldCount);
-
-        System.out.println("--- Plot Category Counts ---");
-        System.out.println("Category A: " + categoryACount);
-        System.out.println("Category B: " + categoryBCount);
-        System.out.println("Category C: " + categoryCCount);
-    }
-
-
-
 }
