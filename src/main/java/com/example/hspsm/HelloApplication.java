@@ -33,6 +33,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 
+import javax.print.Doc;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -345,7 +346,7 @@ public class HelloApplication extends Application{
         preferredLocationField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
         preferredLocationField.setPrefWidth(800);
         TextField preferredSizeField = new TextField();
-        preferredSizeField.setPromptText("Enter your Preferred Plot Size");
+        preferredSizeField.setPromptText("Enter your Preferred Plot Size (in Marla)");
         preferredSizeField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-color: #fff; -fx-border-color: black; -fx-border-radius: 5px;");
         preferredSizeField.setPrefWidth(800);
         TextField budgetField = new TextField();
@@ -1580,6 +1581,13 @@ public class HelloApplication extends Application{
                     Payment newPayment = new Payment(newId, Integer.parseInt(plotIdField.getText()), Integer.parseInt(buyerIdField.getText()), Double.parseDouble(amountField.getText()), methodField.getText(), outstandingBalance, LocalDate.now());
                     payments.add(newPayment);
                     savePayments(payments);
+                    if(outstandingBalance==0){
+                        ObservableList<Document> documents = loadDocuments();
+                        int documentId = documents.size()+1;
+                        Document document = new Document(documentId,  Integer.parseInt(plotIdField.getText()), Integer.parseInt(buyerIdField.getText()), "Ownership", LocalDate.now());
+                        documents.add(document);
+                        saveDocuments(documents);
+                    }
 
                     // Show success alert
                     Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
@@ -1813,8 +1821,8 @@ public class HelloApplication extends Application{
         reportTextArea.setWrapText(true);
 
         // Set preferred width and height for the TextArea
-        reportTextArea.setPrefWidth(1200);  // Adjust width as per your requirement
-        reportTextArea.setPrefHeight(400);  // Adjust height as per your requirement
+        reportTextArea.setPrefWidth(1200);
+        reportTextArea.setPrefHeight(400);
 
         // Create PieCharts for plot types and statuses
         PieChart plotTypeChart = new PieChart();
@@ -1853,7 +1861,6 @@ public class HelloApplication extends Application{
         chartsLayout.setAlignment(Pos.CENTER);
         chartsLayout.getChildren().addAll(plotTypeChart, plotStatusChart);
 
-        // Add a Print Button
         Button printButton = new Button("Print Report");
         printButton.setOnAction(e -> {
             // Print the entire layout (including charts and text)
@@ -1869,7 +1876,7 @@ public class HelloApplication extends Application{
         // Add a Close Button
         Button closeButton = new Button("Close");
         closeButton.setOnAction(e -> {
-            stage.close();
+            adminDashboardScene(stage);
         });
 
         // Combine elements in layout
@@ -2270,9 +2277,8 @@ public class HelloApplication extends Application{
             }
         }
 
-
         if (ownershipDocs.isEmpty()) {
-            showAlertMessage(Alert.AlertType.INFORMATION, "No Documents", "No ownership documents found for this buyer.");
+            showAlertMessage(Alert.AlertType.INFORMATION, "No Documents", "No ownership documents found for you.");
         }
 
         tableView.setItems(ownershipDocs);
@@ -2409,7 +2415,7 @@ public class HelloApplication extends Application{
         sizeBox.setAlignment(Pos.CENTER);
         sizeBox.setSpacing(10);
         TextField preferredSizeField = new TextField();
-        preferredSizeField.setPromptText("Enter preferred size (in square meters)");
+        preferredSizeField.setPromptText("Enter preferred size (in Marla)");
         preferredSizeField.setStyle("-fx-font-size: 16px; -fx-padding: 10; -fx-background-color: white; -fx-text-fill: black;");
         preferredSizeField.setPrefWidth(300);
         sizeBox.getChildren().add(preferredSizeField);
