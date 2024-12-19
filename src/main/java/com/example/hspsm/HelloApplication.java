@@ -11,7 +11,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
+
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -21,21 +21,18 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
+
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.transform.Transform;
+
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.awt.*;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
+
 import java.time.LocalDate;
 import java.util.*;
 
@@ -1251,12 +1248,17 @@ public class HelloApplication extends Application{
                         alert.setContentText("All fields must be completed before saving.");
                         alert.showAndWait();
                     } else {
-
+                        ObservableList<Plot> plots = loadPlots();
+                        int plotId = loadPlots().size()+1;
+                        double area = Double.parseDouble(lengthField.getText())*Double.parseDouble(widthField.getText())*0.00367309;
+                        Plot newPlot = new Plot(plotId, numberField.getText(), Double.parseDouble(lengthField.getText()),Double.parseDouble(widthField.getText()),area,locationField.getText(), typeField.getText(), categoryField.getText(),Double.parseDouble(priceUnitField.getText()),Double.parseDouble(priceUnitField.getText())*area, statusField.getText());
+                        plots.add(newPlot);
+                        savePlots(plots);
                         Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
                         successAlert.setTitle("Plot Added");
                         successAlert.setHeaderText("The plot has been successfully added.");
                         successAlert.showAndWait();
-
+                        plotTable.setItems(loadPlots());
                         addStage.close();
                     }
                 } catch (NumberFormatException ex) {
@@ -1284,7 +1286,41 @@ public class HelloApplication extends Application{
             inputGrid.add(priceUnitField, 1, 6);
             inputGrid.add(status, 0, 7);
             inputGrid.add(statusField, 1, 7);
+            numberField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    lengthField.requestFocus();
+            });
+            lengthField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    widthField.requestFocus();
+            });
+            widthField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    locationField.requestFocus();
+            });
+            locationField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    typeField.requestFocus();
+            });
 
+            typeField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    categoryField.requestFocus();
+            });
+            categoryField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    priceUnitField.requestFocus();
+            });
+
+            priceUnitField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    statusField.requestFocus();
+            });
+
+            statusField.setOnKeyPressed(event->{
+                if(event.getCode().toString().equals("ENTER"))
+                    saveButton.fire();
+            });
             inputBox.getChildren().addAll(inputGrid, saveButton);
             addVBox.getChildren().add(inputBox);
 
@@ -1724,130 +1760,135 @@ public class HelloApplication extends Application{
         stage.show();
     }
 
-public void generateReportScene(Stage stage) {
-    VBox layout = new VBox(10);
-    layout.setPadding(new Insets(10));
+    public void generateReportScene(Stage stage) {
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10));
 
-    ObservableList<Plot> plots = loadPlots();
+        ObservableList<Plot> plots = loadPlots();
 
-    int residentialCount = 0;
-    int commercialCount = 0;
-    int availableCount = 0;
-    int reservedCount = 0;
-    int soldCount = 0;
+        int residentialCount = 0;
+        int commercialCount = 0;
+        int availableCount = 0;
+        int reservedCount = 0;
+        int soldCount = 0;
 
-    int cornerCount = 0;
-    int parkFacingCount = 0;
-    int mainBoulevardCount = 0;
+        int cornerCount = 0;
+        int parkFacingCount = 0;
+        int mainBoulevardCount = 0;
 
-    for (Plot plot : plots) {
-        // Count plot types
-        if ("Residential".equalsIgnoreCase(plot.getPlotType())) {
-            residentialCount++;
-        } else if ("Commercial".equalsIgnoreCase(plot.getPlotType())) {
-            commercialCount++;
+        for (Plot plot : plots) {
+            // Count plot types
+            if ("Residential".equalsIgnoreCase(plot.getPlotType())) {
+                residentialCount++;
+            } else if ("Commercial".equalsIgnoreCase(plot.getPlotType())) {
+                commercialCount++;
+            }
+
+            // Count plot statuses
+            if ("Available".equalsIgnoreCase(plot.getStatus())) {
+                availableCount++;
+            } else if ("Reserved".equalsIgnoreCase(plot.getStatus())) {
+                reservedCount++;
+            } else if ("Sold".equalsIgnoreCase(plot.getStatus())) {
+                soldCount++;
+            }
+
+            // Count plot categories
+            if ("Corner".equalsIgnoreCase(plot.getPlotCategory())) {
+                cornerCount++;
+            } else if ("Park-Facing".equalsIgnoreCase(plot.getPlotCategory())) {
+                parkFacingCount++;
+            } else if ("Main Boulevard".equalsIgnoreCase(plot.getPlotCategory())) {
+                mainBoulevardCount++;
+            }
         }
 
-        // Count plot statuses
-        if ("Available".equalsIgnoreCase(plot.getStatus())) {
-            availableCount++;
-        } else if ("Reserved".equalsIgnoreCase(plot.getStatus())) {
-            reservedCount++;
-        } else if ("Sold".equalsIgnoreCase(plot.getStatus())) {
-            soldCount++;
-        }
+        // Create report and statistics
+        String report = generateReports();
+        String plotStatistics = analyzePlotStatistics();
 
-        // Count plot categories
-        if ("Corner".equalsIgnoreCase(plot.getPlotCategory())) {
-            cornerCount++;
-        } else if ("Park-Facing".equalsIgnoreCase(plot.getPlotCategory())) {
-            parkFacingCount++;
-        } else if ("Main Boulevard".equalsIgnoreCase(plot.getPlotCategory())) {
-            mainBoulevardCount++;
-        }
+        // Create a TextArea for textual reports and make it larger
+        final TextArea reportTextArea = new TextArea(report + "\n\n" + plotStatistics);
+        reportTextArea.setEditable(false);
+        reportTextArea.setWrapText(true);
+
+        // Set preferred width and height for the TextArea
+        reportTextArea.setPrefWidth(1200);  // Adjust width as per your requirement
+        reportTextArea.setPrefHeight(400);  // Adjust height as per your requirement
+
+        // Create PieCharts for plot types and statuses
+        PieChart plotTypeChart = new PieChart();
+        plotTypeChart.setTitle("Plot Type Distribution");
+        plotTypeChart.getData().addAll(
+                new PieChart.Data("Residential", residentialCount),
+                new PieChart.Data("Commercial", commercialCount)
+        );
+
+        PieChart plotStatusChart = new PieChart();
+        plotStatusChart.setTitle("Plot Status Distribution");
+        plotStatusChart.getData().addAll(
+                new PieChart.Data("Available", availableCount),
+                new PieChart.Data("Reserved", reservedCount),
+                new PieChart.Data("Sold", soldCount)
+        );
+
+        // Create BarChart for plot categories
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        BarChart<String, Number> plotCategoryChart = new BarChart<>(xAxis, yAxis);
+        plotCategoryChart.setTitle("Plot Category Distribution");
+        xAxis.setLabel("Category");
+        yAxis.setLabel("Count");
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Categories");
+        series.getData().addAll(
+                new XYChart.Data<>("Corner", cornerCount),
+                new XYChart.Data<>("Park-Facing", parkFacingCount),
+                new XYChart.Data<>("Main Boulevard", mainBoulevardCount)
+        );
+        plotCategoryChart.getData().add(series);
+
+        // Layout for charts in a single row (HBox)
+        HBox chartsLayout = new HBox(20);  // 20px spacing between charts
+        chartsLayout.setAlignment(Pos.CENTER);
+        chartsLayout.getChildren().addAll(plotTypeChart, plotStatusChart);
+
+        // Add a Print Button
+        Button printButton = new Button("Print Report");
+        printButton.setOnAction(e -> {
+            // Print the entire layout (including charts and text)
+            String contentToPrint = reportTextArea.getText();
+            if (!contentToPrint.isEmpty()) {
+                print(contentToPrint);  // Print the whole scene including charts and text
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "No report to print!");
+                alert.show();
+            }
+        });
+
+        // Add a Close Button
+        Button closeButton = new Button("Close");
+        closeButton.setOnAction(e -> {
+            stage.close();
+        });
+
+        // Combine elements in layout
+        layout.getChildren().addAll(
+                reportTextArea,
+                new Label("Plot Type and Status Distribution"),
+                chartsLayout,
+                new Label("Plot Category Distribution"),
+                plotCategoryChart,
+                printButton,
+                closeButton
+        );
+
+        Scene scene = new Scene(layout, 1300, 800);
+        stage.setScene(scene);
+        stage.setTitle("Generate Report");
+        stage.show();
     }
 
-    // Create report and statistics
-    String report = generateReports();
-    String plotStatistics = analyzePlotStatistics();
-
-    // Create a TextArea for textual reports
-    final TextArea reportTextArea = new TextArea(report + "\n\n" + plotStatistics);
-    reportTextArea.setEditable(false);
-    reportTextArea.setWrapText(true);
-
-    // Create PieCharts for plot types and statuses
-    PieChart plotTypeChart = new PieChart();
-    plotTypeChart.setTitle("Plot Type Distribution");
-    plotTypeChart.getData().addAll(
-            new PieChart.Data("Residential", residentialCount),
-            new PieChart.Data("Commercial", commercialCount)
-    );
-
-    PieChart plotStatusChart = new PieChart();
-    plotStatusChart.setTitle("Plot Status Distribution");
-    plotStatusChart.getData().addAll(
-            new PieChart.Data("Available", availableCount),
-            new PieChart.Data("Reserved", reservedCount),
-            new PieChart.Data("Sold", soldCount)
-    );
-
-    // Create BarChart for plot categories
-    CategoryAxis xAxis = new CategoryAxis();
-    NumberAxis yAxis = new NumberAxis();
-    BarChart<String, Number> plotCategoryChart = new BarChart<>(xAxis, yAxis);
-    plotCategoryChart.setTitle("Plot Category Distribution");
-    xAxis.setLabel("Category");
-    yAxis.setLabel("Count");
-    XYChart.Series<String, Number> series = new XYChart.Series<>();
-    series.setName("Categories");
-    series.getData().addAll(
-            new XYChart.Data<>("Corner", cornerCount),
-            new XYChart.Data<>("Park-Facing", parkFacingCount),
-            new XYChart.Data<>("Main Boulevard", mainBoulevardCount)
-    );
-    plotCategoryChart.getData().add(series);
-
-    // Layout for charts in a single row (HBox)
-    HBox chartsLayout = new HBox(20);  // 20px spacing between charts
-    chartsLayout.setAlignment(Pos.CENTER);
-    chartsLayout.getChildren().addAll(plotTypeChart, plotStatusChart);
-
-    // Add a Print Button
-    Button printButton = new Button("Print Report");
-    printButton.setOnAction(e -> {
-        // Print the entire layout (including charts and text)
-        String contentToPrint = reportTextArea.getText();
-        if (!contentToPrint.isEmpty()) {
-            print(contentToPrint);  // Print the whole scene including charts and text
-        } else {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "No report to print!");
-            alert.show();
-        }
-    });
-
-    // Add a Close Button
-    Button closeButton = new Button("Close");
-    closeButton.setOnAction(e -> {
-        stage.close();
-    });
-
-    // Combine elements in layout
-    layout.getChildren().addAll(
-            reportTextArea,
-            new Label("Plot Type and Status Distribution"),
-            chartsLayout,
-            new Label("Plot Category Distribution"),
-            plotCategoryChart,
-            printButton,
-            closeButton
-    );
-
-    Scene scene = new Scene(layout, 1300, 800);
-    stage.setScene(scene);
-    stage.setTitle("Generate Report");
-    stage.show();
-}
     private static void print(String content) {
 
         PrinterJob printerJob = PrinterJob.createPrinterJob();
