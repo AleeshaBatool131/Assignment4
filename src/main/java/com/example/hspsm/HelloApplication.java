@@ -1015,9 +1015,10 @@ public class HelloApplication extends Application{
         vBox.setSpacing(10);
         vBox.setBackground(background());
 
-        Label titleLabel = new Label("Plots Management");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-        titleLabel.setFont(new Font("Times New Roman", 56));
+        Label titleLabel = new Label("Plots Management Section");
+        titleLabel.setStyle("-fx-font-size: 50px; -fx-font-weight: bold;");
+        titleLabel.setFont(new Font("Times New Roman", 80));
+        titleLabel.setTextFill(Color.WHITE);
         titleLabel.setPadding(new Insets(10, 10, 50, 10));
         titleLabel.setAlignment(Pos.CENTER);
         vBox.getChildren().add(titleLabel);
@@ -1066,7 +1067,79 @@ public class HelloApplication extends Application{
         Button editButton = new Button("Edit Plot");
         Button deleteButton = new Button("Delete Plot");
 
+        addButton.setStyle("-fx-background-color: #3b5998; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 18px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10 20; " +
+                "-fx-border-radius: 5; " +
+                "-fx-background-radius: 5;");
 
+        editButton.setStyle("-fx-background-color: #3b5998; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 18px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10 20; " +
+                "-fx-border-radius: 5; " +
+                "-fx-background-radius: 5;");
+
+        deleteButton.setStyle("-fx-background-color: #3b5998; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 18px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10 20; " +
+                "-fx-border-radius: 5; " +
+                "-fx-background-radius: 5;");
+
+
+        addButton.setOnMouseEntered(e -> addButton.setStyle("-fx-background-color: #5a7ad6; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 18px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10 20; " +
+                "-fx-border-radius: 5; " +
+                "-fx-background-radius: 5;"));
+
+        addButton.setOnMouseExited(e -> addButton.setStyle("-fx-background-color: #3b5998; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 18px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10 20; " +
+                "-fx-border-radius: 5; " +
+                "-fx-background-radius: 5;"));
+
+
+        editButton.setOnMouseEntered(e -> editButton.setStyle("-fx-background-color: #5a7ad6; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 18px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10 20; " +
+                "-fx-border-radius: 5; " +
+                "-fx-background-radius: 5;"));
+
+        editButton.setOnMouseExited(e -> editButton.setStyle("-fx-background-color: #3b5998; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 18px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10 20; " +
+                "-fx-border-radius: 5; " +
+                "-fx-background-radius: 5;"));
+
+        deleteButton.setOnMouseEntered(e -> deleteButton.setStyle("-fx-background-color: #5a7ad6; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 18px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10 20; " +
+                "-fx-border-radius: 5; " +
+                "-fx-background-radius: 5;"));
+
+        deleteButton.setOnMouseExited(e -> deleteButton.setStyle("-fx-background-color: #3b5998; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-size: 18px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10 20; " +
+                "-fx-border-radius: 5; " +
+                "-fx-background-radius: 5;"));
         addButton.setOnAction(e -> {
             Stage addStage = new Stage();
             VBox addVBox = new VBox(10);
@@ -1074,20 +1147,45 @@ public class HelloApplication extends Application{
             addVBox.setSpacing(15);
             addVBox.setPadding(new Insets(10));
             addVBox.setBackground(background());
+
+
+            VBox inputBox = new VBox(10);
+            inputBox.setAlignment(Pos.CENTER);
+            inputBox.setPadding(new Insets(20));
+            inputBox.setSpacing(15);
+            inputBox.setStyle("-fx-background-color: #ffffff; " +
+                    "-fx-border-color: #cccccc; " +
+                    "-fx-border-width: 2; " +
+                    "-fx-border-radius: 10; " +
+                    "-fx-background-radius: 10;");
+
             GridPane inputGrid = new GridPane();
             inputGrid.setAlignment(Pos.CENTER);
-            inputGrid.setHgap(10);
-            inputGrid.setVgap(15);
+            inputGrid.setHgap(15);
+            inputGrid.setVgap(20);
             inputGrid.setPadding(new Insets(20, 30, 20, 20));
 
-            Label plotNumber = new Label("Plot Number: ");
-            Label length = new Label("Length: ");
-            Label width = new Label("Width: ");
-            Label location = new Label("Location: ");
-            Label type = new Label("Plot Type: ");
-            Label category = new Label("Plot Category: ");
-            Label pricePerMarla = new Label("Price Per Marla: ");
-            Label status = new Label("Status: ");
+            Label plotNumber = new Label("Plot Number:");
+            Label length = new Label("Length:");
+            Label width = new Label("Width:");
+            Label location = new Label("Location:");
+            Label type = new Label("Plot Type:");
+            Label category = new Label("Plot Category:");
+            Label pricePerMarla = new Label("Price Per Marla:");
+            Label status = new Label("Status:");
+
+            String labelStyle = "-fx-font-size: 18px; " +
+                    "-fx-font-weight: bold; " +
+                    "-fx-text-fill: #2a2a2a;";
+
+            plotNumber.setStyle(labelStyle);
+            length.setStyle(labelStyle);
+            width.setStyle(labelStyle);
+            location.setStyle(labelStyle);
+            type.setStyle(labelStyle);
+            category.setStyle(labelStyle);
+            pricePerMarla.setStyle(labelStyle);
+            status.setStyle(labelStyle);
 
             TextField numberField = new TextField();
             numberField.setPromptText("Plot Number");
@@ -1096,7 +1194,7 @@ public class HelloApplication extends Application{
             lengthField.setPromptText("Length (ft.)");
 
             TextField widthField = new TextField();
-            widthField.setPromptText("Width(ft.)");
+            widthField.setPromptText("Width (ft.)");
 
             TextField locationField = new TextField();
             locationField.setPromptText("Location");
@@ -1113,28 +1211,46 @@ public class HelloApplication extends Application{
             TextField categoryField = new TextField();
             categoryField.setPromptText("Plot Category (Corner, Park Facing, etc)");
 
+            String textFieldStyle = "-fx-font-size: 14px; " +
+                    "-fx-padding: 5 10; " +
+                    "-fx-border-color: #cccccc; " +
+                    "-fx-border-width: 1; " +
+                    "-fx-border-radius: 5; " +
+                    "-fx-background-radius: 5;";
+
+            numberField.setStyle(textFieldStyle);
+            lengthField.setStyle(textFieldStyle);
+            widthField.setStyle(textFieldStyle);
+            locationField.setStyle(textFieldStyle);
+            typeField.setStyle(textFieldStyle);
+            statusField.setStyle(textFieldStyle);
+            priceUnitField.setStyle(textFieldStyle);
+            categoryField.setStyle(textFieldStyle);
+
             Button saveButton = new Button("Save");
+            String buttonStyle = "-fx-background-color: #28a745; " +
+                    "-fx-text-fill: white; " +
+                    "-fx-font-size: 16px; " +
+                    "-fx-font-weight: bold; " +
+                    "-fx-padding: 10 20; " +
+                    "-fx-border-radius: 5; " +
+                    "-fx-background-radius: 5;";
+
+            saveButton.setStyle(buttonStyle);
+
             saveButton.setOnAction(event -> {
                 try {
-                    if (numberField.getText().isEmpty() || lengthField.getText().isEmpty() || widthField.getText().isEmpty() ||
-                            locationField.getText().isEmpty() || typeField.getText().isEmpty() || categoryField.getText().isEmpty() ||
+                    if (numberField.getText().isEmpty() || lengthField.getText().isEmpty() ||
+                            widthField.getText().isEmpty() || locationField.getText().isEmpty() ||
+                            typeField.getText().isEmpty() || categoryField.getText().isEmpty() ||
                             priceUnitField.getText().isEmpty() || statusField.getText().isEmpty()) {
+
                         Alert alert = new Alert(Alert.AlertType.WARNING);
                         alert.setTitle("Missing Fields");
                         alert.setHeaderText("Please fill in all fields.");
                         alert.setContentText("All fields must be completed before saving.");
                         alert.showAndWait();
                     } else {
-                        int newId = plotTable.getItems().size() + 1;
-                        double area = Double.parseDouble(lengthField.getText()) * Double.parseDouble(widthField.getText()) * 0.00367309;
-                        double price = Double.parseDouble(priceUnitField.getText()) * area;
-                        Plot newPlot = new Plot(newId, numberField.getText(), Double.parseDouble(lengthField.getText()),
-                                Double.parseDouble(widthField.getText()), area, locationField.getText(),
-                                typeField.getText(), categoryField.getText(), Double.parseDouble(priceUnitField.getText()),
-                                price, statusField.getText());
-                        ObservableList<Plot> plots = plotTable.getItems();
-                        plots.add(newPlot);
-                        savePlots(plots);
 
                         Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
                         successAlert.setTitle("Plot Added");
@@ -1153,64 +1269,31 @@ public class HelloApplication extends Application{
             });
 
             inputGrid.add(plotNumber, 0, 0);
-            inputGrid.add(numberField, 1,0);
+            inputGrid.add(numberField, 1, 0);
             inputGrid.add(length, 0, 1);
-            inputGrid.add(lengthField,1,1);
-            inputGrid.add(width,0, 2);
+            inputGrid.add(lengthField, 1, 1);
+            inputGrid.add(width, 0, 2);
             inputGrid.add(widthField, 1, 2);
-            inputGrid.add(location,0,3);
-            inputGrid.add(locationField,1,3);
-            inputGrid.add(type,0, 4);
-            inputGrid.add(typeField,1, 4);
-            inputGrid.add(category,0,5);
-            inputGrid.add(categoryField,1,5);
-            inputGrid.add(pricePerMarla,0,6);
-            inputGrid.add(priceUnitField,1,6);
-            inputGrid.add(status,0, 7);
+            inputGrid.add(location, 0, 3);
+            inputGrid.add(locationField, 1, 3);
+            inputGrid.add(type, 0, 4);
+            inputGrid.add(typeField, 1, 4);
+            inputGrid.add(category, 0, 5);
+            inputGrid.add(categoryField, 1, 5);
+            inputGrid.add(pricePerMarla, 0, 6);
+            inputGrid.add(priceUnitField, 1, 6);
+            inputGrid.add(status, 0, 7);
             inputGrid.add(statusField, 1, 7);
 
-            numberField.setOnKeyPressed(event->{
-                if(event.getCode().toString().equals("ENTER"))
-                    lengthField.requestFocus();
-            });
-            lengthField.setOnKeyPressed(event->{
-                if(event.getCode().toString().equals("ENTER"))
-                    widthField.requestFocus();
-            });
-            widthField.setOnKeyPressed(event->{
-                if(event.getCode().toString().equals("ENTER"))
-                    locationField.requestFocus();
-            });
-            locationField.setOnKeyPressed(event->{
-                if(event.getCode().toString().equals("ENTER"))
-                    typeField.requestFocus();
-            });
+            inputBox.getChildren().addAll(inputGrid, saveButton);
+            addVBox.getChildren().add(inputBox);
 
-            typeField.setOnKeyPressed(event->{
-                if(event.getCode().toString().equals("ENTER"))
-                    categoryField.requestFocus();
-            });
-            categoryField.setOnKeyPressed(event->{
-                if(event.getCode().toString().equals("ENTER"))
-                    priceUnitField.requestFocus();
-            });
-
-            priceUnitField.setOnKeyPressed(event->{
-                if(event.getCode().toString().equals("ENTER"))
-                    statusField.requestFocus();
-            });
-
-            statusField.setOnKeyPressed(event->{
-                if(event.getCode().toString().equals("ENTER"))
-                    saveButton.fire();
-            });
-
-
-            addVBox.getChildren().addAll(inputGrid, saveButton);
             addStage.setScene(new Scene(addVBox, 1300, 800));
             addStage.setTitle("Add Plot");
             addStage.show();
         });
+
+
 
 
         editButton.setOnAction(e -> {
@@ -1640,135 +1723,13 @@ public class HelloApplication extends Application{
         stage.setTitle("Manage Payments");
         stage.show();
     }
-//    public void generateReportScene(Stage stage) {
-//        VBox layout = new VBox(10);
-//        layout.setPadding(new Insets(10));
-//
-//        ObservableList<Plot> plots = loadPlots();
-//// Count plot types, statuses, and categories
-//        int residentialCount = 0;
-//        int commercialCount = 0;
-//        int availableCount = 0;
-//        int reservedCount = 0;
-//        int soldCount = 0;
-//
-//        int cornerCount = 0;
-//        int parkFacingCount = 0;
-//        int mainBoulevardCount = 0;
-//
-//        for (Plot plot : plots) {
-//            // Count plot types
-//            if ("Residential".equalsIgnoreCase(plot.getPlotType())) {
-//                residentialCount++;
-//            } else if ("Commercial".equalsIgnoreCase(plot.getPlotType())) {
-//                commercialCount++;
-//            }
-//
-//            // Count plot statuses
-//            if ("Available".equalsIgnoreCase(plot.getStatus())) {
-//                availableCount++;
-//            } else if ("Reserved".equalsIgnoreCase(plot.getStatus())) {
-//                reservedCount++;
-//            } else if ("Sold".equalsIgnoreCase(plot.getStatus())) {
-//                soldCount++;
-//            }
-//
-//            // Count plot categories
-//            if ("Corner".equalsIgnoreCase(plot.getPlotCategory())) {
-//                cornerCount++;
-//            } else if ("Park-Facing".equalsIgnoreCase(plot.getPlotCategory())) {
-//                parkFacingCount++;
-//            } else if ("Main Boulevard".equalsIgnoreCase(plot.getPlotCategory())) {
-//                mainBoulevardCount++;
-//            }
-//        }
-//        // Load data and generate reports
-//        String report = generateReports();
-//        String plotStatistics = analyzePlotStatistics();
-//
-//        // Create a TextArea for textual reports
-//        final TextArea reportTextArea = new TextArea(report + "\n\n" + plotStatistics);
-//        reportTextArea.setEditable(false);
-//        reportTextArea.setWrapText(true);
-//
-//        // Create a PieChart for plot types
-//        PieChart plotTypeChart = new PieChart();
-//        plotTypeChart.setTitle("Plot Type Distribution");
-//        plotTypeChart.getData().addAll(
-//                new PieChart.Data("Residential", residentialCount),
-//                new PieChart.Data("Commercial", commercialCount)
-//        );
-//
-//
-//        // Create a PieChart for plot statuses
-//        PieChart plotStatusChart = new PieChart();
-//        plotStatusChart.setTitle("Plot Status Distribution");
-//        plotStatusChart.getData().addAll(
-//                new PieChart.Data("Available", availableCount),
-//                new PieChart.Data("Reserved", reservedCount),
-//                new PieChart.Data("Sold", soldCount)
-//        );
-//
-//        // Create a BarChart for plot categories
-//        CategoryAxis xAxis = new CategoryAxis();
-//        NumberAxis yAxis = new NumberAxis();
-//        BarChart<String, Number> plotCategoryChart = new BarChart<>(xAxis, yAxis);
-//        plotCategoryChart.setTitle("Plot Category Distribution");
-//        xAxis.setLabel("Category");
-//        yAxis.setLabel("Count");
-//        XYChart.Series<String, Number> series = new XYChart.Series<>();
-//        series.setName("Categories");
-//        series.getData().addAll(
-//                new XYChart.Data<>("Corner", cornerCount),
-//                new XYChart.Data<>("Park-Facing", parkFacingCount),
-//                new XYChart.Data<>("Main Boulevard", mainBoulevardCount)
-//        );
-//        plotCategoryChart.getData().add(series);
-//
-//        // Add a Print Button
-//        Button printButton = new Button("Print Report");
-//        printButton.setOnAction(e -> {
-//            String contentToPrint = reportTextArea.getText();
-//            if (!contentToPrint.isEmpty()) {
-//                print(contentToPrint);
-//            } else {
-//                Alert alert = new Alert(Alert.AlertType.WARNING, "No report to print!");
-//                alert.show();
-//            }
-//        });
-//
-//        // Add a Close Button
-//        Button closeButton = new Button("Close");
-//        closeButton.setOnAction(e -> {
-//            stage.close();
-//        });
-//
-//        // Combine elements in layout
-//        layout.getChildren().addAll(
-//                reportTextArea,
-//                new Label("Plot Type Distribution"),
-//                plotTypeChart,
-//                new Label("Plot Status Distribution"),
-//                plotStatusChart,
-//                new Label("Plot Category Distribution"),
-//                plotCategoryChart,
-//                printButton,
-//                closeButton
-//        );
-//
-//        Scene scene = new Scene(layout, 1300, 800);
-//        stage.setScene(scene);
-//        stage.setTitle("Generate Report");
-//        stage.show();
-//    }
-//
 
 public void generateReportScene(Stage stage) {
     VBox layout = new VBox(10);
     layout.setPadding(new Insets(10));
 
     ObservableList<Plot> plots = loadPlots();
-    // Count plot types, statuses, and categories
+
     int residentialCount = 0;
     int commercialCount = 0;
     int availableCount = 0;
@@ -1917,7 +1878,7 @@ public void generateReportScene(Stage stage) {
                 alert.show();
             }
         } else {
-            // User cancelled the print dialog
+
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Printing cancelled.");
             alert.show();
         }
@@ -1933,7 +1894,7 @@ public void generateReportScene(Stage stage) {
         Label titleLabel = new Label("Buyer Dashboard");
         titleLabel.setFont(new Font("Times New Roman", 55));
         titleLabel.setPadding(new Insets(20, 30,30, 30));
-        titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: white;");
 
         GridPane functionsGridPane = new GridPane();
         functionsGridPane.setVgap(15);
@@ -1947,13 +1908,13 @@ public void generateReportScene(Stage stage) {
         VBox updateBox = new VBox();
         VBox mapBox = new VBox();
 
-        // Create buttons
+
         Button viewPlots = new Button();
         Button requestPlot = new Button();
         Button ownershipDetails = new Button();
         Button trackPaymentStatus = new Button();
         Button updatePreference = new Button();
-        Button viewMap = new Button(); // New Map button
+        Button viewMap = new Button();
 
         viewPlotsBox.setSpacing(10);
         viewPlotsBox.setAlignment(Pos.CENTER);
@@ -2024,7 +1985,7 @@ public void generateReportScene(Stage stage) {
         Button logout = new Button("Logout");
         logout.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-padding: 10 20; -fx-font-size: 14;");
         logout.setPrefSize(150, 80);
-//         Set button actions
+
         viewPlots.setOnAction(e -> viewPlots(stage, buyerId));
         requestPlot.setOnAction(e -> requestPlot(stage, buyerId));
         ownershipDetails.setOnAction(e -> ownershipDetails(stage, buyerId));
@@ -2045,34 +2006,52 @@ public void generateReportScene(Stage stage) {
         functionsGridPane.add(trackPaymentStatus,1,0);
         functionsGridPane.add(updatePreference,1,1);
         functionsGridPane.add(viewMap, 1, 2);
-        // Add buttons to VBox
+
         vBox.getChildren().addAll(titleLabel,
                 functionsGridPane,
                 logout
         );
 
-        // Create scene and set on stage
+
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Buyer Dashboard");
     }
-
-    private void viewPlots(Stage stage, int buyerId){
+    private void viewPlots(Stage stage, int buyerId) {
         VBox vBox = new VBox();
         vBox.setBackground(background());
-        Button exit = new Button("Exit");
+        vBox.setSpacing(20);
+        Label titleLabel = new Label("View Available Plots");
+        titleLabel.setAlignment(Pos.CENTER);
+        titleLabel.setPadding(new Insets(100, 50, 50, 100));
+
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: white;");
+        titleLabel.setFont(new Font("Times New Roman", 56));
+
+
+        vBox.getChildren().add(titleLabel);
+
+
         TableView<Plot> plotTable = new TableView<>();
-        ObservableList<Plot> plotData= loadPlots();
+        ObservableList<Plot> plotData = loadPlots();
 
         if (plotData == null || plotData.isEmpty()) {
             Label noPlotsLabel = new Label("No available plots");
             noPlotsLabel.setFont(new Font("Times New Roman", 18));
-            vBox.getChildren().addAll(noPlotsLabel, exit);
-            Scene scene = new Scene(vBox, 1300, 800);
-            stage.setScene(scene);
-            stage.setTitle("View Plots");
-            return;
+            vBox.getChildren().addAll(noPlotsLabel);
         }
+
+
+            Button exit = new Button("Exit");
+            exit.setPrefSize(100, 60);
+            exit.setAlignment(Pos.CENTER);
+            exit.setPadding(new Insets(10));
+            exit.setStyle("-fx-font-size: 14px; -fx-text-fill: white; -fx-background-color: green;");
+            exit.setOnAction(e -> buyerDashboard(stage, buyerId));
+        HBox buttonBox = new HBox(exit);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.setPadding(new Insets(20, 0, 20, 0));
+
 
 
         TableColumn<Plot, Integer> idColumn = new TableColumn<>("Plot ID");
@@ -2108,33 +2087,45 @@ public void generateReportScene(Stage stage) {
         TableColumn<Plot, Double> priceColumn = new TableColumn<>("Total Price");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
 
-        plotTable.getColumns().addAll(idColumn, numberColumn, lengthColumn, widthColumn, areaColumn, locationColumn, typeColumn, categoryColumn, marlaColumn,  priceColumn, statusColumn);
+        plotTable.getColumns().addAll(idColumn, numberColumn, lengthColumn, widthColumn, areaColumn, locationColumn, typeColumn, categoryColumn, marlaColumn, priceColumn, statusColumn);
 
 
         FilteredList<Plot> filteredPlots = new FilteredList<>(plotData, plot -> "Available".equals(plot.getStatus()));
-
-        // Set the filtered list to the TableView
         plotTable.setItems(filteredPlots);
-        exit.setOnAction(e->{
-            buyerDashboard(stage, buyerId);
-        });
-        vBox.getChildren().addAll(plotTable,exit);
+
+        vBox.getChildren().addAll(plotTable, buttonBox);
+
+
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("View Plots");
     }
+
     public void requestPlot(Stage stage, int buyerId) {
         VBox vBox = new VBox();
+
+        vBox.setBackground(background());
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setSpacing(20);
+
         Label label = new Label("Request a Plot");
+        label.setStyle("-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;");
+
+        HBox plotIdBox = new HBox();
+        plotIdBox.setAlignment(Pos.CENTER);
+        plotIdBox.setSpacing(10);
         TextField plotIdField = new TextField();
         plotIdField.setPromptText("Enter Plot ID");
-        Button submitButton = new Button("Submit");
-        Button backButton = new Button("Back");
+        plotIdField.setStyle("-fx-font-size: 16px; -fx-padding: 10; -fx-background-color: white; -fx-text-fill: black;");
+        plotIdField.setPrefWidth(300);
+        plotIdBox.getChildren().add(plotIdField);
 
+
+        Button submitButton = new Button("Submit");
+        submitButton.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: green; -fx-padding: 10;");
         submitButton.setOnAction(e -> {
             String plotIdText = plotIdField.getText();
 
-            // Validate the plot ID input
             if (plotIdText.isEmpty()) {
                 showAlertMessage(Alert.AlertType.ERROR, "Error", "Plot ID cannot be empty.");
                 return;
@@ -2148,7 +2139,7 @@ public void generateReportScene(Stage stage) {
                 return;
             }
 
-            // Load plots and check if the entered Plot ID exists
+
             ObservableList<Plot> plots = loadPlots();
             boolean plotFound = false;
             for (Plot plot : plots) {
@@ -2157,9 +2148,9 @@ public void generateReportScene(Stage stage) {
                         showAlertMessage(Alert.AlertType.WARNING, "Plot Reserved", "This plot is already reserved.");
                         return;
                     }
-                    // Reserve the plot
-                    plot.setStatus("Reserved");
-                    savePlots(plots);
+
+                    plot.setStatus("Reserved");  // Reserve the plot
+                    savePlots(plots);  // Save the updated list of plots
                     showAlertMessage(Alert.AlertType.INFORMATION, "Success", "Plot request submitted successfully!");
                     plotFound = true;
                     break;
@@ -2171,15 +2162,22 @@ public void generateReportScene(Stage stage) {
             }
         });
 
+
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: red; -fx-padding: 10;");
         backButton.setOnAction(e -> {
             buyerDashboard(stage, buyerId);
         });
 
-        vBox.getChildren().addAll(label, plotIdField, submitButton, backButton);
+
+        vBox.getChildren().addAll(label, plotIdBox, submitButton, backButton);
+
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Request Plot");
     }
+
+
     private void showAlertMessage(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -2188,50 +2186,64 @@ public void generateReportScene(Stage stage) {
     }
     public void ownershipDetails(Stage stage, int loggedInBuyerId) {
         VBox vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setSpacing(20);
+
+
+        vBox.setBackground(background());
+
         Label label = new Label("Ownership Details");
+        label.setStyle("-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;");
+
+
         TableView<Document> tableView = new TableView<>();
 
-        // Define columns for the TableView
+
         TableColumn<Document, Integer> documentIdColumn = new TableColumn<>("Document ID");
         documentIdColumn.setCellValueFactory(new PropertyValueFactory<>("documentId"));
-
+        documentIdColumn.setPrefWidth(120);
         TableColumn<Document, Integer> buyerIdColumn = new TableColumn<>("Buyer ID");
         buyerIdColumn.setCellValueFactory(new PropertyValueFactory<>("buyerId"));
+        buyerIdColumn.setPrefWidth(120);
 
         TableColumn<Document, Integer> plotIdColumn = new TableColumn<>("Plot ID");
         plotIdColumn.setCellValueFactory(new PropertyValueFactory<>("plotId"));
+        plotIdColumn.setPrefWidth(120);
 
         TableColumn<Document, String> documentTypeColumn = new TableColumn<>("Document Type");
         documentTypeColumn.setCellValueFactory(new PropertyValueFactory<>("documentType"));
-
+        documentTypeColumn.setPrefWidth(180);
         TableColumn<Document, LocalDate> uploadDateColumn = new TableColumn<>("Upload Date");
         uploadDateColumn.setCellValueFactory(new PropertyValueFactory<>("uploadDate"));
+        uploadDateColumn.setPrefWidth(180);
 
-        // Add columns to the TableView
         tableView.getColumns().addAll(documentIdColumn, buyerIdColumn, plotIdColumn, documentTypeColumn, uploadDateColumn);
-        // Load ownership documents and set them in the TableView
+
+
         List<Document> documents = loadDocuments();
         ObservableList<Document> ownershipDocs = FXCollections.observableArrayList();
 
-        // Filter documents based on the logged-in buyer and document type
         for (Document doc : documents) {
             if ("Ownership".equalsIgnoreCase(doc.getDocumentType()) && doc.getBuyerId() == loggedInBuyerId) {
                 ownershipDocs.add(doc);
             }
         }
-        // If no documents found, show an alert
+
+
         if (ownershipDocs.isEmpty()) {
             showAlertMessage(Alert.AlertType.INFORMATION, "No Documents", "No ownership documents found for this buyer.");
         }
 
-        // Set the filtered ownership documents to the TableView
         tableView.setItems(ownershipDocs);
 
-        // Back button to return to buyerDashboard
+
         Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: red; -fx-padding: 10; -fx-pref-width: 200;");
         backButton.setOnAction(e -> buyerDashboard(stage, loggedInBuyerId));
 
         vBox.getChildren().addAll(label, tableView, backButton);
+
+
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Ownership Details");
@@ -2239,109 +2251,149 @@ public void generateReportScene(Stage stage) {
 
     public void trackPaymentStatus(Stage stage, int buyerId) {
         VBox vBox = new VBox();
-        Label label = new Label("Track Payment Status");
 
-        // Input fields for plot ID (to track payments)
+        vBox.setBackground(background());
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setSpacing(20);
+
+        Label label = new Label("Track Payment Status");
+        label.setStyle("-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;");
+
+        HBox plotIdBox = new HBox();
+        plotIdBox.setAlignment(Pos.CENTER);
+        plotIdBox.setSpacing(10);
         TextField plotIdField = new TextField();
         plotIdField.setPromptText("Enter Plot ID");
-
-        Button searchButton = new Button("Search Payments");
-
-        // TableView for displaying payment history
+        plotIdField.setStyle("-fx-font-size: 16px; -fx-padding: 10; -fx-background-color: white; -fx-text-fill: black;");
+        plotIdField.setPrefWidth(300);
+        plotIdBox.getChildren().add(plotIdField);
         TableView<Payment> tableView = new TableView<>();
 
-        // Define columns for the TableView
-        TableColumn<Payment, Integer> paymentIdColumn = new TableColumn<>("Payment ID");
-        paymentIdColumn.setCellValueFactory(new PropertyValueFactory<>("paymentId"));
-
-        TableColumn<Payment, Integer> buyerIdColumn = new TableColumn<>("Buyer ID");
-        buyerIdColumn.setCellValueFactory(new PropertyValueFactory<>("buyerId"));
-
-        TableColumn<Payment, Integer> plotIdColumn = new TableColumn<>("Plot ID");
-        plotIdColumn.setCellValueFactory(new PropertyValueFactory<>("plotId"));
-
-        TableColumn<Payment, Double> amountPaidColumn = new TableColumn<>("Amount Paid");
-        amountPaidColumn.setCellValueFactory(new PropertyValueFactory<>("amountPaid"));
-
-        TableColumn<Payment, Double> outstandingBalanceColumn = new TableColumn<>("Outstanding Balance");
-        outstandingBalanceColumn.setCellValueFactory(new PropertyValueFactory<>("outstandingBalance"));
-
-        TableColumn<Payment, String> paymentMethodColumn = new TableColumn<>("Payment Method");
-        paymentMethodColumn.setCellValueFactory(new PropertyValueFactory<>("paymentMethod"));
-
-        TableColumn<Payment, LocalDate> paymentDateColumn = new TableColumn<>("Payment Date");
-        paymentDateColumn.setCellValueFactory(new PropertyValueFactory<>("paymentDate"));
-
-        // Add columns to the TableView
-        tableView.getColumns().addAll(paymentIdColumn, buyerIdColumn, plotIdColumn, amountPaidColumn, outstandingBalanceColumn, paymentMethodColumn, paymentDateColumn);
-
-        // Action for search button
+        Button searchButton = new Button("Search Payments");
+        searchButton.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: green; -fx-padding: 10;");
         searchButton.setOnAction(e -> {
             String plotIdText = plotIdField.getText();
             if (plotIdText.isEmpty()) {
-                showAlertMessage(Alert.AlertType.ERROR,"Error", "Please enter a Plot ID.");
+                showAlertMessage(Alert.AlertType.ERROR, "Error", "Please enter a Plot ID.");
                 return;
             }
 
             try {
                 int plotId = Integer.parseInt(plotIdText);
 
-                // Fetch payment history for the entered plot ID
                 List<Payment> paymentList = new ArrayList<>();
                 List<Payment> payments = loadPayments();
-                for(Payment payment: payments){
-                    if(payment.getPlotId()==plotId){
+                for (Payment payment : payments) {
+                    if (payment.getPlotId() == plotId) {
                         paymentList.add(payment);
                     }
                 }
 
                 if (paymentList.isEmpty()) {
-                    showAlertMessage(Alert.AlertType.INFORMATION,"No Payments Found", "No payment records found for the given Plot ID.");
+                    showAlertMessage(Alert.AlertType.INFORMATION, "No Payments Found", "No payment records found for the given Plot ID.");
                 } else {
                     ObservableList<Payment> paymentData = FXCollections.observableArrayList(paymentList);
                     tableView.setItems(paymentData);
                 }
             } catch (NumberFormatException ex) {
-                showAlertMessage(Alert.AlertType.ERROR,"Invalid Input", "Please enter a valid Plot ID.");
+                showAlertMessage(Alert.AlertType.ERROR, "Invalid Input", "Please enter a valid Plot ID.");
             }
         });
 
-        // Back button to return to buyerDashboard
+        TableColumn<Payment, Integer> paymentIdColumn = new TableColumn<>("Payment ID");
+        paymentIdColumn.setCellValueFactory(new PropertyValueFactory<>("paymentId"));
+        paymentIdColumn.setPrefWidth(120);
+
+        TableColumn<Payment, Integer> buyerIdColumn = new TableColumn<>("Buyer ID");
+        buyerIdColumn.setCellValueFactory(new PropertyValueFactory<>("buyerId"));
+        buyerIdColumn.setPrefWidth(120);
+        TableColumn<Payment, Integer> plotIdColumn = new TableColumn<>("Plot ID");
+        plotIdColumn.setCellValueFactory(new PropertyValueFactory<>("plotId"));
+        plotIdColumn.setPrefWidth(120);
+        TableColumn<Payment, Double> amountPaidColumn = new TableColumn<>("Amount Paid");
+        amountPaidColumn.setCellValueFactory(new PropertyValueFactory<>("amountPaid"));
+        amountPaidColumn.setPrefWidth(150);
+
+        TableColumn<Payment, Double> outstandingBalanceColumn = new TableColumn<>("Outstanding Balance");
+        outstandingBalanceColumn.setCellValueFactory(new PropertyValueFactory<>("outstandingBalance"));
+        outstandingBalanceColumn.setPrefWidth(150);
+
+        TableColumn<Payment, String> paymentMethodColumn = new TableColumn<>("Payment Method");
+        paymentMethodColumn.setCellValueFactory(new PropertyValueFactory<>("paymentMethod"));
+        paymentMethodColumn.setPrefWidth(150);
+        TableColumn<Payment, LocalDate> paymentDateColumn = new TableColumn<>("Payment Date");
+        paymentDateColumn.setCellValueFactory(new PropertyValueFactory<>("paymentDate"));
+        paymentDateColumn.setPrefWidth(200);
+
+        tableView.getColumns().addAll(paymentIdColumn, buyerIdColumn, plotIdColumn, amountPaidColumn, outstandingBalanceColumn, paymentMethodColumn, paymentDateColumn);
+
+        tableView.setStyle("-fx-font-size: 14px; -fx-padding: 10;");
+
+
         Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: red; -fx-padding: 10;");
         backButton.setOnAction(e -> buyerDashboard(stage, buyerId));
 
-        vBox.getChildren().addAll(label, plotIdField, searchButton, tableView, backButton);
+
+        vBox.getChildren().addAll(label, plotIdBox, searchButton, tableView, backButton);
+
+
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Track Payment Status");
     }
 
-    public void updatePreference(Stage stage,int buyerId) {
-        VBox vBox = new VBox();
-        Label label = new Label("Update Preferences");
 
-        // Fields to input preferred location, size, and budget
+    public void updatePreference(Stage stage, int buyerId) {
+        VBox vBox = new VBox();
+
+
+        vBox.setBackground(background());
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setSpacing(20);
+
+        Label label = new Label("Update Preferences");
+        label.setStyle("-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 0);");
+
+        HBox locationBox = new HBox();
+        locationBox.setAlignment(Pos.CENTER);
+        locationBox.setSpacing(10);
         TextField preferredLocationField = new TextField();
         preferredLocationField.setPromptText("Enter preferred location");
+        preferredLocationField.setStyle("-fx-font-size: 16px; -fx-padding: 10; -fx-background-color: white; -fx-text-fill: black;");
+        preferredLocationField.setPrefWidth(300);
+        locationBox.getChildren().add(preferredLocationField);
 
+        HBox sizeBox = new HBox();
+        sizeBox.setAlignment(Pos.CENTER);
+        sizeBox.setSpacing(10);
         TextField preferredSizeField = new TextField();
         preferredSizeField.setPromptText("Enter preferred size (in square meters)");
+        preferredSizeField.setStyle("-fx-font-size: 16px; -fx-padding: 10; -fx-background-color: white; -fx-text-fill: black;");
+        preferredSizeField.setPrefWidth(300);
+        sizeBox.getChildren().add(preferredSizeField);
 
+        HBox budgetBox = new HBox();
+        budgetBox.setAlignment(Pos.CENTER);
+        budgetBox.setSpacing(10);
         TextField budgetField = new TextField();
         budgetField.setPromptText("Enter budget");
+        budgetField.setStyle("-fx-font-size: 16px; -fx-padding: 10; -fx-background-color: white; -fx-text-fill: black;");
+        budgetField.setPrefWidth(300);
+        budgetBox.getChildren().add(budgetField);
+
 
         Button updateButton = new Button("Update");
-        Button backButton = new Button("Back");
-
+        updateButton.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: green; -fx-padding: 10;");
         updateButton.setOnAction(e -> {
-            // Retrieve the input values
+
             String preferredLocation = preferredLocationField.getText();
             String preferredSizeText = preferredSizeField.getText();
             String budgetText = budgetField.getText();
 
-            // Validate the inputs
+
             if (preferredLocation.isEmpty() || preferredSizeText.isEmpty() || budgetText.isEmpty()) {
-                showAlertMessage(Alert.AlertType.ERROR,"Error", "Please fill all the fields.");
+                showAlertMessage(Alert.AlertType.ERROR, "Error", "Please fill all the fields.");
                 return;
             }
 
@@ -2352,28 +2404,30 @@ public void generateReportScene(Stage stage) {
                 preferredSize = Double.parseDouble(preferredSizeText);
                 budget = Double.parseDouble(budgetText);
             } catch (NumberFormatException ex) {
-                showAlertMessage(Alert.AlertType.ERROR,"Error", "Please enter valid numbers for size and budget.");
+                showAlertMessage(Alert.AlertType.ERROR, "Error", "Please enter valid numbers for size and budget.");
                 return;
             }
 
-            // Placeholder: Logic for updating preferences (e.g., storing them in a database)
-            // For now, just show a success message
+
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Preferences updated successfully!");
             alert.showAndWait();
 
-            // After updating, go back to the buyer dashboard
             buyerDashboard(stage, buyerId);
         });
 
-        backButton.setOnAction(e -> {
-            buyerDashboard(stage, buyerId);
-        });
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: red; -fx-padding: 10;");
+        backButton.setOnAction(e -> buyerDashboard(stage, buyerId));
 
-        vBox.getChildren().addAll(label, preferredLocationField, preferredSizeField, budgetField, updateButton, backButton);
+
+        vBox.getChildren().addAll(label, locationBox, sizeBox, budgetBox, updateButton, backButton);
+
         Scene scene = new Scene(vBox, 1300, 800);
         stage.setScene(scene);
         stage.setTitle("Update Preferences");
     }
+
+
     // Load Users as ObservableList
     public static ObservableList<User> loadUsers() {
         ObservableList<User> users = FXCollections.observableArrayList();
